@@ -16,16 +16,31 @@ import { Input } from "@/components/ui/input";
 import { Wallpaper } from "@/types/wallpaper";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Select } from "../ui/select";
 
 interface Props {
   wallpapers: Wallpaper[];
   setWallpapers: Dispatch<SetStateAction<Wallpaper[]>>;
 }
 
+const LLM_NAMES = ["dall-e-3", "dall-e-2"];
+const IMG_SIZES = {
+  "dall-e-3": ["1792x1024", "1024x1792", "1024x1024"],
+  "dall-e-2": ["1024x1024", "512x512", "256x256"],
+};
+const QUALITIES = ["hd", "standard"];
+const STYLES = ["vivid", "natural"];
+
 export default function ({ setWallpapers }: Props) {
   const { user, fetchUserInfo } = useContext(AppContext);
 
   const [description, setDescription] = useState("");
+  const [llmname, setLlmname] = useState(LLM_NAMES[0]);
+  const [imgsize, setImgsize] = useState(
+    IMG_SIZES[llmname as keyof typeof IMG_SIZES][0]
+  );
+  const [quality, setQuality] = useState(QUALITIES[0]);
+  const [style, setStyle] = useState(STYLES[0]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [wallpaper, setWallpaper] = useState<Wallpaper | null>(null);
@@ -36,6 +51,10 @@ export default function ({ setWallpapers }: Props) {
       const uri = "/api/protected/gen-wallpaper";
       const params = {
         description: description,
+        llm_name: llmname,
+        img_size: imgsize,
+        quality: quality,
+        style: style,
       };
 
       setLoading(true);
@@ -117,33 +136,59 @@ export default function ({ setWallpapers }: Props) {
 
   return (
     <div className="flex flex-col w-full">
-      <form
-        className="flex w-full flex-col gap-3 sm:flex-row"
-        onSubmit={() => {
-          return false;
-        }}
-      >
-        <Input
-          type="text"
-          placeholder="Wallpaper description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          onKeyDown={handleInputKeydown}
-          disabled={loading}
-          ref={inputRef}
-        />
+      <div className="flex flex-col w-full">
+        <form
+          className="flex w-full flex-col gap-3 sm:flex-row"
+          onSubmit={() => {
+            return false;
+          }}
+        >
+          <Input
+            type="text"
+            placeholder="Wallpaper description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onKeyDown={handleInputKeydown}
+            disabled={loading}
+            ref={inputRef}
+          />
+          <Button type="button" disabled={loading} onClick={handleSubmit}>
+            {loading ? "Generating..." : "Generate"}
+          </Button>
+        </form>
+      </div>
 
-        {/* <input
-          type="button"
-          value={loading ? "Generating..." : "Generate"}
-          className="cursor-pointer rounded-md bg-black px-6 py-2 font-semibold text-white disabled:bg-gray-300"
+      <h3 className="mx-2 my-4 text-sm text-[#636262]">Advance Options:</h3>
+      <div className="flex w-full gap-3">
+        {/* Dropdown of LLM model */}
+        <Select
+          value={llmname}
+          onChange={(e) => setLlmname(e.target.value)}
           disabled={loading}
-          onClick={handleSubmit}
-        /> */}
-        <Button type="button" disabled={loading} onClick={handleSubmit}>
-          {loading ? "Generating..." : "Generate"}
-        </Button>
-      </form>
+          options={LLM_NAMES}
+        />
+        {/* Dropdown of image size */}
+        <Select
+          value={imgsize}
+          onChange={(e) => setImgsize(e.target.value)}
+          disabled={loading}
+          options={IMG_SIZES[llmname as keyof typeof IMG_SIZES]}
+        />
+        {/* Dropdown of image quality */}
+        <Select
+          value={quality}
+          onChange={(e) => setQuality(e.target.value)}
+          disabled={loading}
+          options={QUALITIES}
+        />
+        {/* Dropdown of image style */}
+        <Select
+          value={style}
+          onChange={(e) => setStyle(e.target.value)}
+          disabled={loading}
+          options={STYLES}
+        />
+      </div>
     </div>
   );
 }

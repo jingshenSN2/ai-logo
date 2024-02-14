@@ -19,7 +19,8 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { description } = await req.json();
+    const { description, llm_name, img_size, quality, style } =
+      await req.json();
     if (!description) {
       return respErr("invalid params");
     }
@@ -41,16 +42,14 @@ export async function POST(req: Request) {
       return respErr("credits not enough");
     }
 
-    const llm_name = "dall-e-3";
-    const img_size = "1792x1024";
     const llm_params: ImageGenerateParams = {
-      prompt: `generate desktop wallpaper image about ${description}`,
-      model: llm_name,
+      prompt: `A logo about ${description}`,
+      model: llm_name || "dall-e-3",
       n: 1,
-      quality: "hd",
+      quality: quality || "hd",
       response_format: "url",
-      size: img_size,
-      style: "vivid",
+      size: img_size || "1792x1024",
+      style: style || "vivid",
     };
     const created_at = new Date().toISOString();
 
@@ -61,7 +60,8 @@ export async function POST(req: Request) {
       return respErr("generate wallpaper failed");
     }
 
-    const img_name = encodeURIComponent(description);
+    const uuid = Math.random().toString(36).substring(2, 15);
+    const img_name = `${uuid}-${created_at}`;
     const s3_img = await downloadAndUploadImage(
       raw_img_url,
       process.env.AWS_BUCKET || "trysai",
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     const wallpaper: Wallpaper = {
       user_email: user_email,
       img_description: description,
-      img_size: img_size,
+      img_size: img_size || "1792x1024",
       img_url: img_url,
       llm_name: llm_name,
       llm_params: JSON.stringify(llm_params),
