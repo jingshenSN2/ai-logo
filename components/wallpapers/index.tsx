@@ -51,9 +51,11 @@ export default function ({ wallpapers, loading }: Props) {
                             <Badge variant="secondary">
                               {wallpaper.llm_name}
                             </Badge>
-                            <Badge variant="secondary">
-                              {wallpaper.llm_params.quality}
-                            </Badge>
+                            {wallpaper.llm_name == "dall-e-3" && (
+                              <Badge variant="secondary">
+                                {wallpaper.llm_params.quality}
+                              </Badge>
+                            )}
                             {wallpaper.llm_name == "dall-e-3" && (
                               <Badge variant="secondary">
                                 {wallpaper.llm_params.style}

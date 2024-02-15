@@ -23,24 +23,31 @@ interface Props {
   setWallpapers: Dispatch<SetStateAction<Wallpaper[]>>;
 }
 
-const LLM_NAMES = ["dall-e-3", "dall-e-2"];
+enum LLM {
+  DALL_E_3 = "dall-e-3",
+  DALL_E_2 = "dall-e-2",
+}
 const IMG_SIZES = {
-  "dall-e-3": ["1792x1024", "1024x1792", "1024x1024"],
-  "dall-e-2": ["1024x1024", "512x512", "256x256"],
+  [LLM.DALL_E_3]: ["1792x1024", "1024x1792", "1024x1024"],
+  [LLM.DALL_E_2]: ["1024x1024", "512x512", "256x256"],
 };
-const QUALITIES = ["hd", "standard"];
-const STYLES = ["vivid", "natural"];
+const QUALITIES = {
+  [LLM.DALL_E_3]: ["hd", "standard"],
+  [LLM.DALL_E_2]: ["standard"],
+};
+const STYLES = {
+  [LLM.DALL_E_3]: ["vivid", "natural"],
+  [LLM.DALL_E_2]: ["natural"],
+};
 
 export default function ({ setWallpapers }: Props) {
   const { user, fetchUserInfo } = useContext(AppContext);
 
   const [description, setDescription] = useState("");
-  const [llmname, setLlmname] = useState(LLM_NAMES[0]);
-  const [imgsize, setImgsize] = useState(
-    IMG_SIZES[llmname as keyof typeof IMG_SIZES][0]
-  );
-  const [quality, setQuality] = useState(QUALITIES[0]);
-  const [style, setStyle] = useState(STYLES[0]);
+  const [llmname, setLlmname] = useState(LLM.DALL_E_3);
+  const [imgsize, setImgsize] = useState(IMG_SIZES[llmname][0]);
+  const [quality, setQuality] = useState(QUALITIES[llmname][0]);
+  const [style, setStyle] = useState(STYLES[llmname][0]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
@@ -162,30 +169,30 @@ export default function ({ setWallpapers }: Props) {
         {/* Dropdown of LLM model */}
         <Select
           value={llmname}
-          onChange={(e) => setLlmname(e.target.value)}
+          onChange={(e) => setLlmname(e.target.value as LLM)}
           disabled={loading}
-          options={LLM_NAMES}
+          options={[LLM.DALL_E_3, LLM.DALL_E_2]}
         />
         {/* Dropdown of image size */}
         <Select
           value={imgsize}
           onChange={(e) => setImgsize(e.target.value)}
           disabled={loading}
-          options={IMG_SIZES[llmname as keyof typeof IMG_SIZES]}
+          options={IMG_SIZES[llmname]}
         />
         {/* Dropdown of image quality */}
         <Select
           value={quality}
           onChange={(e) => setQuality(e.target.value)}
           disabled={loading}
-          options={QUALITIES}
+          options={QUALITIES[llmname]}
         />
         {/* Dropdown of image style */}
         <Select
           value={style}
           onChange={(e) => setStyle(e.target.value)}
           disabled={loading}
-          options={STYLES}
+          options={STYLES[llmname]}
         />
       </div>
     </div>
