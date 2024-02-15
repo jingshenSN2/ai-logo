@@ -43,7 +43,6 @@ export default function ({ setWallpapers }: Props) {
   const [style, setStyle] = useState(STYLES[0]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [wallpaper, setWallpaper] = useState<Wallpaper | null>(null);
   const router = useRouter();
 
   const requestGenWallpaper = async function () {
@@ -83,7 +82,7 @@ export default function ({ setWallpapers }: Props) {
           setDescription("");
 
           const wallpaper: Wallpaper = data;
-          setWallpaper(wallpaper);
+          wallpaper.llm_params = JSON.parse(wallpaper.llm_params);
           setWallpapers((wallpapers: Wallpaper[]) => [
             wallpaper,
             ...wallpapers,

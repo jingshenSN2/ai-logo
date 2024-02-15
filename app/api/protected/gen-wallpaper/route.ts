@@ -77,6 +77,7 @@ export async function POST(req: Request) {
       llm_name: llm_name,
       llm_params: JSON.stringify(llm_params),
       created_at: created_at,
+      created_user: userInfo,
     };
     await insertWallpaper(wallpaper);
 
