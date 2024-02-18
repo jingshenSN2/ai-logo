@@ -1,7 +1,7 @@
 import { User } from "./user";
 
-export interface Wallpaper {
-  id?: number;
+export interface Logo {
+  id?: string;
   user_email: string;
   img_description: string;
   img_size: string;

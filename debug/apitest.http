@@ -1,15 +1,15 @@
 @baseUri=http://127.0.0.1:8010/api 
 
-### generate wallpaper
-POST {{baseUri}}/protected/gen-wallpaper
+### generate logo
+POST {{baseUri}}/protected/gen-logo
 Content-Type: application/json
 
 {
     "description": "happy new year 2024"
 }
 
-### get wallpapers
-POST {{baseUri}}/get-wallpapers
+### get logos
+POST {{baseUri}}/get-logos
 Content-Type: application/json
 
 {

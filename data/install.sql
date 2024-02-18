@@ -6,7 +6,7 @@ CREATE TABLE users (
     created_at timestamptz
 );
 
-CREATE TABLE wallpapers (
+CREATE TABLE logos (
     id SERIAL PRIMARY KEY,
     user_email VARCHAR(255) NOT NULL,
     img_description TEXT,

@@ -110,11 +110,11 @@ export default function () {
     <div className="relative isolate bg-white px-6 py-8 md:py-16 lg:px-8">
       <div className="mx-auto max-w-3xl text-center lg:max-w-4xl">
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-          AI Wallpaper Pricing
+          AI Logo Pricing
         </h1>
       </div>
       <h2 className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
-        Choose a plan to buy credits, Unleash your creativity with AI Wallpaper.
+        Choose a plan to buy credits, Unleash your creativity with AI Logo.
       </h2>
       <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
         {tiers.map((tier, tierIdx) => (

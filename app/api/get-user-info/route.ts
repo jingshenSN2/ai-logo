@@ -12,12 +12,14 @@ export async function POST(req: Request) {
   }
 
   try {
+    const id = user.id;
     const email = user.emailAddresses[0].emailAddress;
-    const nickname = user.firstName;
+    const nickname = user.firstName || user.lastName || "";
     const avatarUrl = user.imageUrl;
     const userInfo: User = {
+      id: id,
       email: email,
-      nickname: nickname || "",
+      nickname: nickname,
       avatar_url: avatarUrl,
     };
 

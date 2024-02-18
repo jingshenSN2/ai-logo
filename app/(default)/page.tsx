@@ -5,19 +5,19 @@ import { useContext, useEffect, useState } from "react";
 import Hero from "@/components/hero";
 import Input from "@/components/input";
 import Producthunt from "@/components/producthunt";
-import { Wallpaper } from "@/types/wallpaper";
-import Wallpapers from "@/components/wallpapers";
+import { Logo } from "@/types/logo";
+import Logos from "@/components/logos";
 import { toast } from "sonner";
 import { AppContext } from "@/contexts/AppContext";
 
 export default function () {
   const { user } = useContext(AppContext);
-  const [wallpapers, setWallpapers] = useState<Wallpaper[]>([]);
+  const [logos, setLogos] = useState<Logo[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchWallpapers = async function (page: number) {
+  const fetchLogos = async function (page: number) {
     try {
-      const uri = "/api/get-wallpapers";
+      const uri = "/api/get-logos";
       const params = {
         page: page,
         limit: 50,
@@ -32,22 +32,22 @@ export default function () {
 
       if (resp.ok) {
         const res = await resp.json();
-        console.log("get wallpapers result: ", res);
+        console.log("get logos result: ", res);
         if (res.data) {
-          setWallpapers(res.data);
+          setLogos(res.data);
           return;
         }
       }
 
-      toast.error("get wallpapers failed");
+      toast.error("get logos failed");
     } catch (e) {
-      console.log("get wallpapers failed: ", e);
-      toast.error("get wallpapers failed");
+      console.log("get logos failed: ", e);
+      toast.error("get logos failed");
     }
   };
 
   useEffect(() => {
-    fetchWallpapers(1);
+    fetchLogos(1);
   }, []);
 
   return (
@@ -58,12 +58,12 @@ export default function () {
           <Producthunt />
         </div>
         <div className="mx-auto my-4 flex max-w-lg justify-center">
-          <Input wallpapers={wallpapers} setWallpapers={setWallpapers} />
+          <Input logos={logos} setLogos={setLogos} />
         </div>
       </div>
 
       <div className="pt-0">
-        <Wallpapers wallpapers={wallpapers} loading={loading} />
+        <Logos logos={logos} loading={loading} />
       </div>
     </div>
   );

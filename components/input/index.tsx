@@ -13,14 +13,14 @@ import {
 import { AppContext } from "@/contexts/AppContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wallpaper } from "@/types/wallpaper";
+import { Logo } from "@/types/logo";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Select } from "../ui/select";
 
 interface Props {
-  wallpapers: Wallpaper[];
-  setWallpapers: Dispatch<SetStateAction<Wallpaper[]>>;
+  logos: Logo[];
+  setLogos: Dispatch<SetStateAction<Logo[]>>;
 }
 
 enum LLM {
@@ -40,7 +40,7 @@ const STYLES = {
   [LLM.DALL_E_2]: ["natural"],
 };
 
-export default function ({ setWallpapers }: Props) {
+export default function ({ setLogos }: Props) {
   const { user, fetchUserInfo } = useContext(AppContext);
 
   const [description, setDescription] = useState("");
@@ -52,9 +52,9 @@ export default function ({ setWallpapers }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
 
-  const requestGenWallpaper = async function () {
+  const requestGenLogo = async function () {
     try {
-      const uri = "/api/protected/gen-wallpaper";
+      const uri = "/api/protected/gen-logo";
       const params = {
         description: description,
         llm_name: llmname,
@@ -75,7 +75,7 @@ export default function ({ setWallpapers }: Props) {
         router.push("/sign-in");
         return;
       }
-      console.log("gen wallpaper resp", resp);
+      console.log("gen logo resp", resp);
 
       if (resp.ok) {
         const { code, message, data } = await resp.json();
@@ -88,22 +88,19 @@ export default function ({ setWallpapers }: Props) {
 
           setDescription("");
 
-          const wallpaper: Wallpaper = data;
-          wallpaper.llm_params = JSON.parse(wallpaper.llm_params);
-          setWallpapers((wallpapers: Wallpaper[]) => [
-            wallpaper,
-            ...wallpapers,
-          ]);
+          const logo: Logo = data;
+          logo.llm_params = JSON.parse(logo.llm_params);
+          setLogos((logos: Logo[]) => [logo, ...logos]);
 
-          toast.success("gen wallpaper ok");
+          toast.success("gen logo ok");
           return;
         }
       }
 
-      toast.error("gen wallpaper failed");
+      toast.error("gen logo failed");
     } catch (e) {
       console.log("search failed: ", e);
-      toast.error("gen wallpaper failed");
+      toast.error("gen logo failed");
     }
   };
 
@@ -133,7 +130,7 @@ export default function ({ setWallpapers }: Props) {
       return;
     }
 
-    requestGenWallpaper();
+    requestGenLogo();
   };
 
   useEffect(() => {
@@ -151,7 +148,7 @@ export default function ({ setWallpapers }: Props) {
         >
           <Input
             type="text"
-            placeholder="Wallpaper description"
+            placeholder="Logo description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             onKeyDown={handleInputKeydown}

@@ -7,15 +7,15 @@ import { Button } from "@/components/ui/button";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { FaDownload } from "react-icons/fa";
 import Image from "next/image";
-import { Wallpaper } from "@/types/wallpaper";
+import { Logo } from "@/types/logo";
 import { toast } from "sonner";
 
 interface Props {
-  wallpapers: Wallpaper[] | null;
+  logos: Logo[] | null;
   loading: boolean;
 }
 
-export default function ({ wallpapers, loading }: Props) {
+export default function ({ logos, loading }: Props) {
   return (
     <section>
       <div className="mx-auto w-full max-w-7xl px-0 py-2 md:px-10 md:py-8 lg:py-8">
@@ -25,16 +25,16 @@ export default function ({ wallpapers, loading }: Props) {
               <div className="text-center mx-auto py-4">loading...</div>
             ) : (
               <>
-                {wallpapers &&
-                  wallpapers.map((wallpaper: Wallpaper, idx: number) => {
+                {logos &&
+                  logos.map((logo: Logo, idx: number) => {
                     return (
                       <div
                         key={idx}
                         className="rounded-xl overflow-hidden mb-4 inline-block border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
                       >
                         <Image
-                          src={wallpaper.img_url}
-                          alt={wallpaper.img_description}
+                          src={logo.img_url}
+                          alt={logo.img_description}
                           width={350}
                           height={200}
                           loading="lazy"
@@ -42,40 +42,36 @@ export default function ({ wallpapers, loading }: Props) {
 
                         <div className="px-5 py-8 sm:px-6">
                           <p className="flex-col text-[#808080]">
-                            {wallpaper.img_description}
+                            {logo.img_description}
                           </p>
                           <div className="flex items-center mb-5 mt-6 flex-wrap gap-2 md:mb-6 lg:mb-8">
-                            <Badge variant="secondary">
-                              {wallpaper.img_size}
-                            </Badge>
-                            <Badge variant="secondary">
-                              {wallpaper.llm_name}
-                            </Badge>
-                            {wallpaper.llm_name == "dall-e-3" && (
+                            <Badge variant="secondary">{logo.img_size}</Badge>
+                            <Badge variant="secondary">{logo.llm_name}</Badge>
+                            {logo.llm_name == "dall-e-3" && (
                               <Badge variant="secondary">
-                                {wallpaper.llm_params.quality}
+                                {logo.llm_params.quality}
                               </Badge>
                             )}
-                            {wallpaper.llm_name == "dall-e-3" && (
+                            {logo.llm_name == "dall-e-3" && (
                               <Badge variant="secondary">
-                                {wallpaper.llm_params.style}
+                                {logo.llm_params.style}
                               </Badge>
                             )}
 
                             <div className="flex-1"></div>
                             <Avatar>
                               <AvatarImage
-                                src={wallpaper.created_user?.avatar_url}
-                                alt={wallpaper.created_user?.nickname}
+                                src={logo.created_user?.avatar_url}
+                                alt={logo.created_user?.nickname}
                               />
                               <AvatarFallback>
-                                {wallpaper.created_user?.nickname}
+                                {logo.created_user?.nickname}
                               </AvatarFallback>
                             </Avatar>
                           </div>
                           <div className="flex flex-wrap items-center justify-between gap-4">
                             <a
-                              href={wallpaper.img_url}
+                              href={logo.img_url}
                               className="flex items-center max-w-full gap-2.5 text-sm font-bold uppercase text-black"
                             >
                               <p>Download</p>
@@ -84,7 +80,7 @@ export default function ({ wallpapers, loading }: Props) {
                               </p>
                             </a>
                             <CopyToClipboard
-                              text={wallpaper.img_description}
+                              text={logo.img_description}
                               onCopy={() => toast.success("Copied")}
                             >
                               <Button>Copy Prompt</Button>

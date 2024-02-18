@@ -7,14 +7,14 @@ export default function () {
   return (
     <div className="mx-auto flex flex-row items-center">
       <a
-        href="https://github.com/all-in-aigc/aiwallpaper"
+        href="https://github.com/all-in-aigc/ailogo"
         target="_blank"
         className="mx-3 flex max-w-[24px] flex-col items-center justify-center"
       >
         <BsGithub className="text-lg" />
       </a>
       <a
-        href="https://www.producthunt.com/posts/ai-wallpaper?utm_source=aiwallpaper.shop"
+        href="https://www.producthunt.com/posts/ai-logo?utm_source=ailogo.shop"
         target="_blank"
         className="mx-3 flex max-w-[24px] flex-col items-center justify-center"
       >

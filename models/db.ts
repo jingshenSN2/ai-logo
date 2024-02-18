@@ -1,16 +1,27 @@
-import { Pool } from "pg";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
-let globalPool: Pool;
+let dbClient: DynamoDBClient;
+let docClient: DynamoDBDocumentClient;
 
-export function getDb() {
-  if (!globalPool) {
-    const connectionString = process.env.POSTGRES_URL;
-    console.log("connectionString", connectionString);
-
-    globalPool = new Pool({
-      connectionString,
+export function getDbClient() {
+  if (!dbClient) {
+    dbClient = new DynamoDBClient({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_AK as string,
+        secretAccessKey: process.env.AWS_SK as string,
+      },
     });
   }
 
-  return globalPool;
+  return dbClient;
+}
+
+export function getDocClient() {
+  if (!docClient) {
+    docClient = DynamoDBDocumentClient.from(getDbClient());
+  }
+
+  return docClient;
 }

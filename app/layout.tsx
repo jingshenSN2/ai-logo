@@ -9,13 +9,12 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    template: "%s by AI Wallpaper Generator | AI Wallpaper Shop",
-    default: "AI Wallpaper Generator | AI Wallpaper Shop",
+    template: "%s by AI Logo Generator | AI Logo Shop",
+    default: "AI Logo Generator | AI Logo Shop",
   },
   description:
-    "AI Wallpaper Shop is an AI Wallpaper Generator, used to generate beautiful wallpapers with AI.",
-  keywords:
-    "AI Wallpaper, AI Wallpaper Shop, AI Wallpaper Generator, AI Wallpaper image",
+    "AI Logo Shop is an AI Logo Generator, used to generate beautiful logos with AI.",
+  keywords: "AI Logo, AI Logo Shop, AI Logo Generator, AI Logo image",
 };
 
 export default function RootLayout({

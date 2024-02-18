@@ -58,7 +58,7 @@ export async function POST(req: Request) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "aiwallpaper.shop credits plan",
+              name: "ailogo.shop credits plan",
             },
             unit_amount: amount,
             recurring:
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       ],
       allow_promotion_codes: true,
       metadata: {
-        project: "aiwallpaper",
+        project: "ailogo",
         pay_scene: "buy-credits",
         order_no: order_no.toString(),
         user_email: user_email,

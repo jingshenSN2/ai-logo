@@ -1,37 +1,41 @@
-# AI Wallpaper
+# AI Logo
 
-AI Wallpaper Generator by [aiwallpaper.shop](https://aiwallpaper.shop)
+AI Logo Generator, powered by OpenAI's DALL-E models.
 
-## Live Demo
+## Inspiration
 
-[https://aiwallpaper.shop](https://aiwallpaper.shop)
-
-![demo](./preview.png)
+This project is built on a fork of [aiwallpaper](https://github.com/all-in-aigc/aiwallpaper).
 
 ## Quick Start
 
 1. clone project
 
 ```shell
-git clone https://github.com/all-in-aigc/aiwallpaper
+git clone https://github.com/jingshenSN2/ai-logo.git
 ```
 
 2. install dependencies
 
 ```shell
-cd aiwallpaper
+cd ai-logo
 pnpm install
 ```
 
-3. init database
+3. database & bucket
 
-create your database use [local postgres](https://wiki.postgresql.org/wiki/Homebrew) or [vercel-postgres](https://vercel.com/docs/storage/vercel-postgres) or [supabase](https://supabase.com/)
+We use `DynamoDB` for data storage and `S3` for image storage.
 
-create tables from sql at `data/install.sql`
+You will need 3 tables in `DynamoDB`:
+
+ailogo-db-user: Primary key: `id` (String), Secondary index: `email` (String),
+ailogo-db-logo: Primary key: `id` (String), Secondary index: `user_email` (String),
+ailogo-db-order: Primary key: `order_no` (String), Secondary index: `user_email` (String).
+
+You will need a bucket in `S3` for image storage with Public access, so that image url can be accessed directly from browser.
 
 4. set environmental values
 
-put `.env.local` under `aiwallpaper` root dir with values list below
+put `.env.local` under root dir with values list below
 
 ```
 OPENAI_API_KEY=""
@@ -72,11 +76,3 @@ open `http://localhost:3000` for preview
 - [stripe](https://stripe.com/docs/development) for payment
 - [node-postgres](https://node-postgres.com/) for data processing
 - [tailwindcss](https://tailwindcss.com/) for page building
-
-## Other Things
-
-you can contact me at Twitter: https://twitter.com/idoubicc
-
-if this project is helpful to you, buy be a coffee.
-
-<a href="https://www.buymeacoffee.com/idoubi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

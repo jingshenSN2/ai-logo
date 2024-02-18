@@ -4,9 +4,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "aitist-aiwallpaper-test.s3.amazonaws.com",
+        hostname: "aitist-ailogo-bucket.s3.amazonaws.com",
         port: "",
-        pathname: "/wallpapers/**",
+        pathname: "/logos/**",
       },
     ],
   },
