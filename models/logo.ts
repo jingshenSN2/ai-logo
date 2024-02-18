@@ -63,7 +63,7 @@ export async function getLogos(
   if (limit <= 0) {
     limit = 50;
   }
-  const offset = (page - 1) * limit;
+  // const offset = (page - 1) * limit;
 
   const docClient = getDocClient();
   const command = new ScanCommand({
@@ -72,7 +72,14 @@ export async function getLogos(
   });
   try {
     const response = await docClient.send(command);
-    return response.Items as Logo[];
+    const logos = response.Items as Logo[];
+    logos.forEach((logo) => {
+      logo.llm_params = JSON.parse(logo.llm_params as string);
+    });
+    logos.sort((a, b) => {
+      return a.created_at < b.created_at ? 1 : -1;
+    });
+    return logos;
   } catch (error) {
     throw error;
   }

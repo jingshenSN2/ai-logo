@@ -1,4 +1,5 @@
 import { respData, respErr } from "@/lib/resp";
+import { v4 } from "uuid";
 
 import { ImageGenerateParams } from "openai/resources/images.mjs";
 import { User } from "@/types/user";
@@ -62,7 +63,7 @@ export async function POST(req: Request) {
       return respErr("generate logo failed");
     }
 
-    const uuid = Math.random().toString(36).substring(2, 15);
+    const uuid = v4();
     const img_name = `${uuid}-${created_at}`;
     const s3_img = await downloadAndUploadImage(
       raw_img_url,
