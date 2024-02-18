@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 
 import Hero from "@/components/hero";
 import Input from "@/components/input";
-import Producthunt from "@/components/producthunt";
+// import Producthunt from "@/components/producthunt";
 import { Logo } from "@/types/logo";
 import Logos from "@/components/logos";
 import { toast } from "sonner";
@@ -54,9 +54,9 @@ export default function () {
     <div className="md:mt-16">
       <div className="max-w-3xl mx-auto">
         <Hero />
-        <div className="my-4 md:my-6">
+        {/* <div className="my-4 md:my-6">
           <Producthunt />
-        </div>
+        </div> */}
         <div className="mx-auto my-4 flex max-w-lg justify-center">
           <Input logos={logos} setLogos={setLogos} />
         </div>
