@@ -10,6 +10,7 @@ import { getOpenAIClient } from "@/services/openai";
 import { getUserCredits } from "@/services/order";
 import { insertLogo } from "@/models/logo";
 import { saveUser } from "@/services/user";
+import { findUserByEmail } from "@/models/user";
 
 export async function POST(req: Request) {
   const client = getOpenAIClient();
@@ -40,8 +41,13 @@ export async function POST(req: Request) {
 
     await saveUser(userInfo);
 
+    const db_user = await findUserByEmail(user_email);
     const user_credits = await getUserCredits(user_email);
-    if (!user_credits || user_credits.left_credits < 1) {
+
+    if (
+      !db_user?.super_user &&
+      (!user_credits || user_credits.left_credits < 1)
+    ) {
       return respErr("credits not enough");
     }
 

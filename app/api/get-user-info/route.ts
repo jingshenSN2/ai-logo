@@ -4,6 +4,7 @@ import { User } from "@/types/user";
 import { currentUser } from "@clerk/nextjs";
 import { getUserCredits } from "@/services/order";
 import { saveUser } from "@/services/user";
+import { findUserByEmail } from "@/models/user";
 
 export async function POST(req: Request) {
   const user = await currentUser();
@@ -24,6 +25,9 @@ export async function POST(req: Request) {
     };
 
     await saveUser(userInfo);
+
+    const db_user = await findUserByEmail(email);
+    userInfo.super_user = db_user?.super_user || false;
 
     const user_credits = await getUserCredits(email);
     userInfo.credits = user_credits;

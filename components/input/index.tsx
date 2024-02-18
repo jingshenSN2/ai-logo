@@ -125,7 +125,8 @@ export default function ({ setLogos }: Props) {
       return;
     }
 
-    if (user.credits && user.credits.left_credits < 1) {
+    console.log("user: ", user);
+    if (!user.super_user && user.credits && user.credits.left_credits < 1) {
       toast.error("credits not enough");
       return;
     }
