@@ -53,7 +53,7 @@ export default function () {
           <div className="mt-10 flex flex-col lg:mt-0">
             <div className="mb-4 flex flex-row items-center">
               <p className="block">contact: </p>
-              <p className="font-inter ml-4 text-black">me@idoubi.cc</p>
+              <p className="font-inter ml-4 text-black">jsgao2109@gmail.com</p>
             </div>
           </div>
         </div>
