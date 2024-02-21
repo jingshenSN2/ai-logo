@@ -27,7 +27,7 @@ export async function findOrderByOrderNo(
   const command = new GetCommand({
     TableName: ORDER_TABLE_NAME,
     Key: {
-      order_no: order_no,
+      id: order_no,
     },
   });
 
@@ -49,7 +49,7 @@ export async function updateOrderStatus(
   const command = new PutCommand({
     TableName: ORDER_TABLE_NAME,
     Item: {
-      order_no: order_no,
+      id: order_no,
       order_status: order_status,
       paied_at: paied_at,
     },
@@ -72,7 +72,7 @@ export async function updateOrderSession(
   const command = new PutCommand({
     TableName: ORDER_TABLE_NAME,
     Item: {
-      order_no: order_no,
+      id: order_no,
       stripe_session_id: stripe_session_id,
     },
   });
@@ -87,16 +87,16 @@ export async function updateOrderSession(
 }
 
 export async function getUserOrders(
-  user_email: string
+  user_id: string
 ): Promise<Order[] | undefined> {
   const now = new Date().toISOString();
   const docClient = getDocClient();
   const command = new QueryCommand({
     TableName: ORDER_TABLE_NAME,
-    IndexName: "user_email-index",
-    KeyConditionExpression: "user_email = :user_email",
+    IndexName: "user_id-index",
+    KeyConditionExpression: "user_id = :user_id",
     ExpressionAttributeValues: {
-      ":user_email": user_email,
+      ":user_id": user_id,
     },
   });
 

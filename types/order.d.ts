@@ -1,9 +1,8 @@
 export interface Order {
-  order_no: string;
+  id: string;
+  user_id: string;
   created_at: string;
-  user_email: string;
   amount: number;
-  plan: string;
   expired_at: string;
   order_status: number;
   paied_at?: string;

@@ -4,7 +4,7 @@ import { User } from "@/types/user";
 import { currentUser } from "@clerk/nextjs";
 import { getUserCredits } from "@/services/order";
 import { saveUser } from "@/services/user";
-import { findUserByEmail } from "@/models/user";
+import { findUser } from "@/models/user_logo";
 
 export async function POST(req: Request) {
   const user = await currentUser();
@@ -22,14 +22,15 @@ export async function POST(req: Request) {
       email: email,
       nickname: nickname,
       avatar_url: avatarUrl,
+      logos: [],
     };
 
     await saveUser(userInfo);
 
-    const db_user = await findUserByEmail(email);
+    const db_user = await findUser(id);
     userInfo.super_user = db_user?.super_user || false;
 
-    const user_credits = await getUserCredits(email);
+    const user_credits = await getUserCredits(id);
     userInfo.credits = user_credits;
 
     return respData(userInfo);

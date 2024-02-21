@@ -9,6 +9,7 @@ export default function () {
   const { user } = useContext(AppContext);
 
   const navigations: Tab[] = [
+    { name: "gallery", title: "Gallery", url: "/gallery" },
     { name: "pricing", title: "Pricing", url: "/pricing" },
   ];
 
@@ -26,7 +27,7 @@ export default function () {
               <span className="font-bold text-primary text-2xl">AI Logo</span>
             </a>
 
-            <div className="hidden md:flex ml-16">
+            <div className="hidden md:flex ml-16 gap-12">
               {navigations.map((tab: Tab, idx: number) => (
                 <a
                   key={idx}

@@ -36,11 +36,10 @@ export async function POST(req: Request) {
     const expired_at = oneMonthLater.toISOString();
 
     const order: Order = {
-      order_no: order_no,
+      id: order_no,
       created_at: created_at,
-      user_email: user_email,
+      user_id: user.id,
       amount: amount,
-      plan: plan,
       expired_at: expired_at,
       order_status: 1,
       credits: credits,

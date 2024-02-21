@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "aitist-ailogo-bucket.s3.amazonaws.com",
+        hostname: "*.cloudfront.net",
         port: "",
         pathname: "/logos/**",
       },

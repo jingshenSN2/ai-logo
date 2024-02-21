@@ -1,10 +1,10 @@
-import { findUserByEmail, insertUser } from "@/models/user";
+import { findUser, insertUser } from "@/models/user_logo";
 
 import { User } from "@/types/user";
 
 export async function saveUser(user: User) {
   try {
-    const existUser = await findUserByEmail(user.email);
+    const existUser = await findUser(user.id);
     if (!existUser) {
       await insertUser(user);
     }
