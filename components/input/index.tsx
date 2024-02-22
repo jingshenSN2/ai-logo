@@ -1,27 +1,13 @@
 "use client";
 
-import {
-  Dispatch,
-  KeyboardEvent,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 
 import { AppContext } from "@/contexts/AppContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Logo } from "@/types/logo";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Select } from "../ui/select";
-
-interface Props {
-  logos: Logo[];
-  setLogos: Dispatch<SetStateAction<Logo[]>>;
-}
 
 enum LLM {
   DALL_E_3 = "dall-e-3",
@@ -40,7 +26,11 @@ const STYLES = {
   [LLM.DALL_E_2]: ["natural"],
 };
 
-export default function ({ setLogos }: Props) {
+interface Props {
+  fetchLogos: () => void;
+}
+
+export default function ({ fetchLogos }: Props) {
   const { user, fetchUserInfo } = useContext(AppContext);
 
   const [description, setDescription] = useState("");
@@ -75,7 +65,6 @@ export default function ({ setLogos }: Props) {
         router.push("/sign-in");
         return;
       }
-      console.log("gen logo resp", resp);
 
       if (resp.ok) {
         const { code, message, data } = await resp.json();
@@ -83,15 +72,10 @@ export default function ({ setLogos }: Props) {
           toast.error(message);
           return;
         }
-        if (data && data.img_url) {
-          fetchUserInfo();
-
+        if (data && data.id) {
           setDescription("");
-
-          const logo: Logo = data;
-          logo.llm_params = JSON.parse(logo.llm_params);
-          setLogos((logos: Logo[]) => [logo, ...logos]);
-
+          fetchUserInfo();
+          fetchLogos();
           toast.success("gen logo ok");
           return;
         }
@@ -125,7 +109,6 @@ export default function ({ setLogos }: Props) {
       return;
     }
 
-    console.log("user: ", user);
     if (!user.super_user && user.credits && user.credits.left_credits < 1) {
       toast.error("credits not enough");
       return;

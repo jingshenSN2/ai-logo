@@ -8,9 +8,8 @@ import { currentUser } from "@clerk/nextjs";
 import { downloadAndUploadImage } from "@/lib/s3";
 import { getOpenAIClient } from "@/services/openai";
 import { getUserCredits } from "@/services/order";
-import { insertLogo } from "@/models/logo";
 import { saveUser } from "@/services/user";
-import { findUserByEmail } from "@/models/user";
+import { findUser, insertLogo, updateLogo } from "@/models/user_logo";
 
 export async function POST(req: Request) {
   const client = getOpenAIClient();
@@ -37,12 +36,13 @@ export async function POST(req: Request) {
       email: user_email,
       nickname: nickname || "",
       avatar_url: avatarUrl,
+      logos: [],
     };
 
     await saveUser(userInfo);
 
-    const db_user = await findUserByEmail(user_email);
-    const user_credits = await getUserCredits(user_email);
+    const db_user = await findUser(user_id);
+    const user_credits = await getUserCredits(user_id);
 
     if (
       !db_user?.super_user &&
@@ -62,35 +62,44 @@ export async function POST(req: Request) {
     };
     const created_at = new Date().toISOString();
 
-    const res = await client.images.generate(llm_params);
-
-    const raw_img_url = res.data[0].url;
-    if (!raw_img_url) {
-      return respErr("generate logo failed");
-    }
-
+    // Create logo obj and save to db
     const uuid = v4();
-    const img_name = `${uuid}-${created_at}`;
-    const s3_img = await downloadAndUploadImage(
-      raw_img_url,
-      process.env.S3_BUCKET || "aitist-ailogo-bucket",
-      `logos/${img_name}.png`
-    );
-    const img_url = s3_img.Location;
-
     const logo: Logo = {
-      id: img_name,
+      id: uuid,
       user_email: user_email,
       img_description: description,
       img_size: img_size || "1792x1024",
-      img_url: img_url,
+      img_quality: quality || "hd",
+      img_style: style || "vivid",
+      img_url: "",
       llm_name: llm_name,
-      llm_params: JSON.stringify(llm_params),
       created_at: created_at,
-      created_user: userInfo,
+      created_user_avatar_url: avatarUrl,
+      created_user_nickname: nickname || "",
+      generating: true,
     };
-    await insertLogo(logo);
+    await insertLogo(user_id, logo);
 
+    client.images.generate(llm_params).then(async (res) => {
+      const raw_img_url = res.data[0].url;
+      if (!raw_img_url) {
+        return respErr("generate logo failed");
+      }
+      const img_path = `logos/${uuid}.png`;
+      const _ = await downloadAndUploadImage(
+        raw_img_url,
+        process.env.S3_BUCKET || "aitist-ailogo-bucket",
+        img_path
+      );
+      const img_url = `${
+        process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"
+      }/${img_path}`;
+
+      // update logo obj and save to db
+      updateLogo(user_id, uuid, { img_url, generating: false });
+    });
+
+    // return immediately before image is generated
     return respData(logo);
   } catch (e) {
     console.log("generate logo failed: ", e);
