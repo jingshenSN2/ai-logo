@@ -84,7 +84,7 @@ export default function () {
         <UserLogos
           logos={userLogos}
           loading={loading}
-          fetchLogos={fetchLogos}
+          setPollLogoID={setPollLogoID}
         />
       </div>
     </div>

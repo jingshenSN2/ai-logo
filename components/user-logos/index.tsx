@@ -15,16 +15,16 @@ import TShirtBackground from "@/public/tshirt-background.png";
 interface ItemProps {
   logo: Logo;
   index: number;
-  fetchLogos: () => Promise<void>;
+  setPollLogoID: (id: string) => void;
 }
 
 interface Props {
   logos: Logo[];
   loading: boolean;
-  fetchLogos: () => Promise<void>;
+  setPollLogoID: (id: string) => void;
 }
 
-function UserLogoItem({ logo, index, fetchLogos }: ItemProps) {
+function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
   const [disable, setDisable] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
@@ -66,7 +66,7 @@ function UserLogoItem({ logo, index, fetchLogos }: ItemProps) {
 
     if (resp.ok) {
       toast.success("Retrying, please wait for a moment");
-      fetchLogos();
+      setPollLogoID(logo.id);
     }
   };
 
@@ -163,7 +163,7 @@ function UserLogoItem({ logo, index, fetchLogos }: ItemProps) {
   );
 }
 
-export default function ({ logos, loading, fetchLogos }: Props) {
+export default function ({ logos, loading, setPollLogoID }: Props) {
   return (
     <section>
       <div className="mx-auto w-full max-w-7xl px-0 py-2 md:px-10 md:py-8 lg:py-8">
@@ -178,7 +178,7 @@ export default function ({ logos, loading, fetchLogos }: Props) {
                     key={logo.id}
                     logo={logo}
                     index={idx}
-                    fetchLogos={fetchLogos}
+                    setPollLogoID={setPollLogoID}
                   />
                 ))}
               </>
