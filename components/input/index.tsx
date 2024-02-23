@@ -5,9 +5,10 @@ import { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { AppContext } from "@/contexts/AppContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ToggleGroup } from "@/components/ui/toggle-group";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Select } from "../ui/select";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 enum LLM {
   DALL_E_3 = "dall-e-3",
@@ -34,6 +35,9 @@ export default function ({ fetchLogos }: Props) {
   const { user, fetchUserInfo } = useContext(AppContext);
 
   const [description, setDescription] = useState("");
+
+  const [advanceOptOpen, setAdvanceOptOpen] = useState(false);
+
   const [llmname, setLlmname] = useState(LLM.DALL_E_3);
   const [imgsize, setImgsize] = useState(IMG_SIZES[llmname][0]);
   const [quality, setQuality] = useState(QUALITIES[llmname][0]);
@@ -145,37 +149,64 @@ export default function ({ fetchLogos }: Props) {
         </form>
       </div>
 
-      <h3 className="mx-2 my-4 text-sm text-[#636262]">Advance Options:</h3>
-      <div className="flex w-full gap-3">
-        {/* Dropdown of LLM model */}
-        <Select
-          value={llmname}
-          onChange={(e) => setLlmname(e.target.value as LLM)}
-          disabled={loading}
-          options={[LLM.DALL_E_3, LLM.DALL_E_2]}
-        />
-        {/* Dropdown of image size */}
-        <Select
-          value={imgsize}
-          onChange={(e) => setImgsize(e.target.value)}
-          disabled={loading}
-          options={IMG_SIZES[llmname]}
-        />
-        {/* Dropdown of image quality */}
-        <Select
-          value={quality}
-          onChange={(e) => setQuality(e.target.value)}
-          disabled={loading}
-          options={QUALITIES[llmname]}
-        />
-        {/* Dropdown of image style */}
-        <Select
-          value={style}
-          onChange={(e) => setStyle(e.target.value)}
-          disabled={loading}
-          options={STYLES[llmname]}
-        />
+      <div className="flex items-center">
+        <h3 className="mx-2 my-4 text-sm text-[#636262]">Advance Options</h3>
+        <div
+          className="cursor-pointer"
+          onClick={() => setAdvanceOptOpen(!advanceOptOpen)}
+        >
+          {advanceOptOpen ? <FaAngleUp /> : <FaAngleDown />}
+        </div>
       </div>
+      {advanceOptOpen && (
+        <div className="w-full gap-3 border border-input rounded-md p-2">
+          {/* Dropdown of LLM model */}
+          <div className="flex items-center">
+            <div className="mx-2 text-sm text-[#636262]">Model:</div>
+            <ToggleGroup
+              value={llmname}
+              onChange={(e) => {
+                setLlmname(e as LLM);
+                setImgsize(IMG_SIZES[e as LLM][0]);
+                setQuality(QUALITIES[e as LLM][0]);
+                setStyle(STYLES[e as LLM][0]);
+              }}
+              disabled={loading}
+              options={[LLM.DALL_E_3, LLM.DALL_E_2]}
+            />
+          </div>
+          {/* Dropdown of image size */}
+          <div className="flex items-center">
+            <div className="mx-2 text-sm text-[#636262]">Image Size:</div>
+            <ToggleGroup
+              value={imgsize}
+              onChange={setImgsize}
+              disabled={loading}
+              options={IMG_SIZES[llmname]}
+            />
+          </div>
+          {/* Dropdown of image quality */}
+          <div className="flex items-center">
+            <div className="mx-2 text-sm text-[#636262]">Quality:</div>
+            <ToggleGroup
+              value={quality}
+              onChange={setQuality}
+              disabled={loading}
+              options={QUALITIES[llmname]}
+            />
+          </div>
+          {/* Dropdown of image style */}
+          <div className="flex items-center">
+            <div className="mx-2 text-sm text-[#636262]">Style:</div>
+            <ToggleGroup
+              value={style}
+              onChange={setStyle}
+              disabled={loading}
+              options={STYLES[llmname]}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

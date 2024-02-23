@@ -27,9 +27,9 @@ export async function handleOrderSession(session_id: string) {
 
 export async function getUserCredits(user_id: string): Promise<UserCredits> {
   let user_credits: UserCredits = {
-    total_credits: 3,
+    total_credits: 10,
     used_credits: 0,
-    left_credits: 3,
+    left_credits: 10,
   };
 
   try {
