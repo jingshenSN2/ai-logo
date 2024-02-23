@@ -91,6 +91,7 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
           width={350}
           height={200}
           loading="lazy"
+          className="aspect-[14/8] object-contain"
         />
         // <div className="relative max-w-[400px] max-h-[518px]">
         //   <Image
@@ -111,7 +112,7 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
         // </div>
       )}
 
-      <div className="px-5 py-8 sm:px-6">
+      <div className="px-5 py-4 sm:px-6">
         <p className="flex-col text-[#808080]">{logo.img_description}</p>
         <div className="flex items-start mb-5 mt-6 flex-wrap gap-2 md:mb-6 lg:mb-8">
           <div className="flex flex-wrap gap-2 flex-1">

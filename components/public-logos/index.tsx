@@ -26,6 +26,7 @@ function PublicLogoItem({ logo, index }: ItemProps) {
         width={350}
         height={200}
         loading="lazy"
+        className="aspect-[14/8] object-contain"
       />
 
       <div className="px-5 py-8 sm:px-6">
