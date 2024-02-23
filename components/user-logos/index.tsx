@@ -8,23 +8,27 @@ import { FaDownload, FaSpinner } from "react-icons/fa";
 import Image from "next/image";
 import { Logo } from "@/types/logo";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import TShirtBackground from "@/public/tshirt-background.png";
 
 interface ItemProps {
   logo: Logo;
   index: number;
+  fetchLogos: () => Promise<void>;
 }
 
 interface Props {
   logos: Logo[];
   loading: boolean;
-  is_public: boolean;
+  fetchLogos: () => Promise<void>;
 }
 
-function UserLogoItem({ logo, index }: ItemProps) {
+function UserLogoItem({ logo, index, fetchLogos }: ItemProps) {
   const [disable, setDisable] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
-  const onClick = async () => {
+  const onClickPublicOrPrivate = async () => {
     const uri = "/api/protected/update-logo";
     const body = JSON.stringify({ logo_id: logo.id });
     setDisable(true);
@@ -50,6 +54,22 @@ function UserLogoItem({ logo, index }: ItemProps) {
     }
   };
 
+  const onClickRetry = async () => {
+    const uri = "/api/protected/regen-logo";
+    const body = JSON.stringify({
+      logo_id: logo.id,
+    });
+
+    setRetrying(true);
+    const resp = await fetch(uri, { method: "POST", body: body });
+    setRetrying(false);
+
+    if (resp.ok) {
+      toast.success("Retrying, please wait for a moment");
+      fetchLogos();
+    }
+  };
+
   return (
     <div
       key={index}
@@ -60,6 +80,10 @@ function UserLogoItem({ logo, index }: ItemProps) {
           <FaSpinner className="animate-spin text-white text-4xl" />
           <p className="text-white text-2xl font-bold mt-2">Generating...</p>
         </div>
+      ) : logo.img_url === "" ? (
+        <div className="py-20 bg-black bg-opacity-50 flex flex-col items-center justify-center">
+          <p className="text-white text-2xl font-bold mt-2">Generate failed</p>
+        </div>
       ) : (
         <Image
           src={logo.img_url}
@@ -68,6 +92,23 @@ function UserLogoItem({ logo, index }: ItemProps) {
           height={200}
           loading="lazy"
         />
+        // <div className="relative max-w-[400px] max-h-[518px]">
+        //   <Image
+        //     src={TShirtBackground}
+        //     alt="tshirt background"
+        //     width={400}
+        //     height={518}
+        //     loading="lazy"
+        //   />
+        //   <Image
+        //     src={logo.img_url}
+        //     alt={logo.img_description}
+        //     width={200}
+        //     height={200}
+        //     loading="lazy"
+        //     className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[40%]"
+        //   />
+        // </div>
       )}
 
       <div className="px-5 py-8 sm:px-6">
@@ -96,6 +137,10 @@ function UserLogoItem({ logo, index }: ItemProps) {
             <div className="flex items-center max-w-full gap-2.5 text-sm font-bold uppercase text-gray-500">
               <p>Download unavailable</p>
             </div>
+          ) : logo.img_url === "" ? (
+            <Button onClick={onClickRetry} disabled={retrying}>
+              Retry
+            </Button>
           ) : (
             <a
               href={logo.img_url}
@@ -107,8 +152,8 @@ function UserLogoItem({ logo, index }: ItemProps) {
               </p>
             </a>
           )}
-          {!logo.generating && (
-            <Button onClick={onClick} disabled={disable}>
+          {!logo.generating && logo.img_url !== "" && (
+            <Button onClick={onClickPublicOrPrivate} disabled={disable}>
               Public/Private
             </Button>
           )}
@@ -118,64 +163,7 @@ function UserLogoItem({ logo, index }: ItemProps) {
   );
 }
 
-function PublicLogoItem({ logo, index }: ItemProps) {
-  return (
-    <div
-      key={index}
-      className="rounded-xl overflow-hidden mb-4 inline-block border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
-    >
-      {logo.generating ? (
-        <div className="absolute top-0 left-0 w-[350px] h-[200px] bg-black bg-opacity-50 flex items-center justify-center">
-          <p className="text-white text-2xl font-bold">Generating...</p>
-        </div>
-      ) : (
-        <Image
-          src={logo.img_url}
-          alt={logo.img_description}
-          width={350}
-          height={200}
-          loading="lazy"
-        />
-      )}
-
-      <div className="px-5 py-8 sm:px-6">
-        <p className="flex-col text-[#808080]">{logo.img_description}</p>
-        <div className="flex items-start mb-5 mt-6 flex-wrap gap-2 md:mb-6 lg:mb-8">
-          <div className="flex flex-wrap gap-2 flex-1">
-            <Badge variant="secondary">{logo.img_size}</Badge>
-            <Badge variant="secondary">{logo.llm_name}</Badge>
-            {logo.llm_name === "dall-e-3" && (
-              <Badge variant="secondary">{logo.img_quality}</Badge>
-            )}
-            {logo.llm_name === "dall-e-3" && (
-              <Badge variant="secondary">{logo.img_style}</Badge>
-            )}
-          </div>
-          <Avatar>
-            <AvatarImage
-              src={logo.created_user_avatar_url}
-              alt={logo.created_user_nickname}
-            />
-            <AvatarFallback>{logo.created_user_nickname}</AvatarFallback>
-          </Avatar>
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <a
-            href={logo.img_url}
-            className="flex items-center max-w-full gap-2.5 text-sm font-bold uppercase text-black"
-          >
-            <p>Download</p>
-            <p className="text-sm">
-              <FaDownload />
-            </p>
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function ({ logos, loading, is_public }: Props) {
+export default function ({ logos, loading, fetchLogos }: Props) {
   return (
     <section>
       <div className="mx-auto w-full max-w-7xl px-0 py-2 md:px-10 md:py-8 lg:py-8">
@@ -185,13 +173,14 @@ export default function ({ logos, loading, is_public }: Props) {
               <div className="text-center mx-auto py-4">loading...</div>
             ) : (
               <>
-                {logos?.map((logo, idx) =>
-                  is_public ? (
-                    <PublicLogoItem key={idx} logo={logo} index={idx} />
-                  ) : (
-                    <UserLogoItem key={idx} logo={logo} index={idx} />
-                  )
-                )}
+                {logos?.map((logo, idx) => (
+                  <UserLogoItem
+                    key={logo.id}
+                    logo={logo}
+                    index={idx}
+                    fetchLogos={fetchLogos}
+                  />
+                ))}
               </>
             )}
           </div>

@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import Hero from "@/components/hero";
 import Input from "@/components/input";
 import { Logo } from "@/types/logo";
-import Logos from "@/components/logos";
+import UserLogos from "@/components/user-logos";
 import { toast } from "sonner";
 import { AppContext } from "@/contexts/AppContext";
 
@@ -81,7 +81,11 @@ export default function () {
       </div>
       <h3 className="text-2xl font-bold">Your logos</h3>
       <div className="pt-0">
-        <Logos logos={userLogos} loading={loading} is_public={false} />
+        <UserLogos
+          logos={userLogos}
+          loading={loading}
+          fetchLogos={fetchLogos}
+        />
       </div>
     </div>
   );
