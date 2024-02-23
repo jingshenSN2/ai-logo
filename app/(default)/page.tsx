@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import Hero from "@/components/hero";
 import Input from "@/components/input";

@@ -35,16 +35,6 @@ export default function ({ user }: Props) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuCheckboxItem className="md:hidden text-center">
-          credits: {user.credits?.left_credits}
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuSeparator className="md:hidden" />
-
-        <DropdownMenuCheckboxItem className="md:hidden">
-          <a href="/pricing">Pricing</a>
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuSeparator className="md:hidden" />
-
         <DropdownMenuCheckboxItem>
           <SignOutButton signOutCallback={() => location.reload()} />
         </DropdownMenuCheckboxItem>

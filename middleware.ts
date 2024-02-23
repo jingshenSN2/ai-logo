@@ -5,7 +5,6 @@ export default authMiddleware({
   publicRoutes: [
     "/",
     "/gallery",
-    "/pricing",
     "/api/get-public-logos",
     "/api/get-user-info",
   ],

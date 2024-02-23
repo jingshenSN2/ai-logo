@@ -1,6 +1,6 @@
 import { PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { getDocClient } from "@/models/db";
-import { User } from "@/types/user";
+import { User, UserCredits } from "@/types/user";
 import { Logo } from "@/types/logo";
 
 const USER_LOGO_TABLE_NAME = process.env.DYNAMODB_TABLE_PREFIX + "user-logo";
@@ -115,12 +115,4 @@ export async function getUserLogos(user_id: string): Promise<Logo[]> {
     return user.logos;
   }
   return [];
-}
-
-export async function getUserUsedCredit(user_id: string): Promise<number> {
-  const user = await findUser(user_id);
-  if (user) {
-    return user.logos.length;
-  }
-  return 0;
 }

@@ -25,11 +25,10 @@ pnpm install
 
 We use `DynamoDB` for data storage and `S3` for image storage.
 
-You will need 3 tables in `DynamoDB`:
+You will need 2 tables in `DynamoDB`:
 
-ailogo-db-user: Primary key: `id` (String), Secondary index: `email` (String),
-ailogo-db-logo: Primary key: `id` (String), Secondary index: `user_email` (String),
-ailogo-db-order: Primary key: `order_no` (String), Secondary index: `user_email` (String).
+ailogo-db-user-logo: Primary key: `id` (String)
+ailogo-db-public-logo: Primary key: `id` (String)
 
 You will need a bucket in `S3` for image storage with Public access, so that image url can be accessed directly from browser.
 
@@ -40,23 +39,22 @@ put `.env.local` under root dir with values list below
 ```
 OPENAI_API_KEY=""
 
-POSTGRES_URL=""
-
 AWS_AK=""
-AWS_SK=""
+AWS_SK="/HkHLupxCW"
 AWS_REGION=""
-AWS_BUCKET=""
+DYNAMODB_TABLE_PREFIX=""
+S3_BUCKET=""
+S3_CLOUDFRONT_URL=""
 
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=""
+CLERK_SECRET_KEY=""
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
 
-STRIPE_PUBLIC_KEY=""
-STRIPE_PRIVATE_KEY=""
-
 WEB_BASE_URI=""
+
 ```
 
 5. local development
@@ -73,6 +71,5 @@ open `http://localhost:3000` for preview
 - [nextjs](https://nextjs.org/docs) for full-stack development
 - [clerk](https://clerk.com/docs/quickstarts/nextjs) for user auth
 - [aws s3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html) for image storage
-- [stripe](https://stripe.com/docs/development) for payment
 - [node-postgres](https://node-postgres.com/) for data processing
 - [tailwindcss](https://tailwindcss.com/) for page building

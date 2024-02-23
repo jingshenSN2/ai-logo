@@ -10,7 +10,6 @@ export default function () {
 
   const navigations: Tab[] = [
     { name: "gallery", title: "Gallery", url: "/gallery" },
-    { name: "pricing", title: "Pricing", url: "/pricing" },
   ];
 
   return (
