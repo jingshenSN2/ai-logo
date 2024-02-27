@@ -27,14 +27,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <Toaster position="top-center" richColors />
-
           {children}
-
-          <script
-            async
-            src="https://chatgpt-umami.vercel.app/script.js"
-            data-website-id="def28550-20ea-49d8-9c1a-68dbfaba0134"
-          ></script>
         </body>
       </html>
     </ClerkProvider>
