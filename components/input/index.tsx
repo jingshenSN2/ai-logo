@@ -1,6 +1,13 @@
 "use client";
 
-import { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import {
+  KeyboardEvent,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 
 import { AppContext } from "@/contexts/AppContext";
 import { Button } from "@/components/ui/button";
@@ -34,14 +41,36 @@ interface Props {
 export default function ({ fetchLogos }: Props) {
   const { user, fetchUserInfo } = useContext(AppContext);
 
-  const [description, setDescription] = useState("");
+  type InputStates = {
+    description: string;
+    llmname: LLM;
+    imgsize: string;
+    quality: string;
+    style: string;
+  };
+
+  const initStates: InputStates = {
+    description: "",
+    llmname: LLM.DALL_E_3,
+    imgsize: IMG_SIZES[LLM.DALL_E_3][0],
+    quality: QUALITIES[LLM.DALL_E_3][0],
+    style: STYLES[LLM.DALL_E_3][0],
+  };
+
+  type Action = { type: "update"; newStates: Partial<InputStates> };
+
+  const reducer = (state: InputStates, action: Action): InputStates => {
+    switch (action.type) {
+      case "update":
+        return { ...state, ...action.newStates };
+      default:
+        return state;
+    }
+  };
+
+  const [inputs, dispatch] = useReducer(reducer, initStates);
 
   const [advanceOptOpen, setAdvanceOptOpen] = useState(false);
-
-  const [llmname, setLlmname] = useState(LLM.DALL_E_3);
-  const [imgsize, setImgsize] = useState(IMG_SIZES[llmname][0]);
-  const [quality, setQuality] = useState(QUALITIES[llmname][0]);
-  const [style, setStyle] = useState(STYLES[llmname][0]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
@@ -50,11 +79,11 @@ export default function ({ fetchLogos }: Props) {
     try {
       const uri = "/api/protected/gen-logo";
       const params = {
-        description: description,
-        llm_name: llmname,
-        img_size: imgsize,
-        quality: quality,
-        style: style,
+        description: inputs.description,
+        llm_name: inputs.llmname,
+        img_size: inputs.imgsize,
+        quality: inputs.quality,
+        style: inputs.style,
       };
 
       setLoading(true);
@@ -77,7 +106,7 @@ export default function ({ fetchLogos }: Props) {
           return;
         }
         if (data && data.id) {
-          setDescription("");
+          dispatch({ type: "update", newStates: { description: "" } });
           fetchUserInfo();
           fetchLogos();
           toast.success("gen logo ok");
@@ -102,7 +131,7 @@ export default function ({ fetchLogos }: Props) {
   };
 
   const handleSubmit = function () {
-    if (!description) {
+    if (!inputs.description) {
       toast.error("invalid image description");
       inputRef.current?.focus();
       return;
@@ -137,8 +166,13 @@ export default function ({ fetchLogos }: Props) {
           <Input
             type="text"
             placeholder="Logo description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={inputs.description}
+            onChange={(e) =>
+              dispatch({
+                type: "update",
+                newStates: { description: e.target.value },
+              })
+            }
             onKeyDown={handleInputKeydown}
             disabled={loading}
             ref={inputRef}
@@ -164,12 +198,17 @@ export default function ({ fetchLogos }: Props) {
           <div className="flex items-center">
             <div className="mx-2 text-sm text-[#636262]">Model:</div>
             <ToggleGroup
-              value={llmname}
+              value={inputs.llmname}
               onChange={(e) => {
-                setLlmname(e as LLM);
-                setImgsize(IMG_SIZES[e as LLM][0]);
-                setQuality(QUALITIES[e as LLM][0]);
-                setStyle(STYLES[e as LLM][0]);
+                dispatch({
+                  type: "update",
+                  newStates: {
+                    llmname: e as LLM,
+                    imgsize: IMG_SIZES[e as LLM][0],
+                    quality: QUALITIES[e as LLM][0],
+                    style: STYLES[e as LLM][0],
+                  },
+                });
               }}
               disabled={loading}
               options={[LLM.DALL_E_3, LLM.DALL_E_2]}
@@ -179,30 +218,36 @@ export default function ({ fetchLogos }: Props) {
           <div className="flex items-center">
             <div className="mx-2 text-sm text-[#636262]">Image Size:</div>
             <ToggleGroup
-              value={imgsize}
-              onChange={setImgsize}
+              value={inputs.imgsize}
+              onChange={(e) =>
+                dispatch({ type: "update", newStates: { imgsize: e } })
+              }
               disabled={loading}
-              options={IMG_SIZES[llmname]}
+              options={IMG_SIZES[inputs.llmname as LLM]}
             />
           </div>
           {/* Dropdown of image quality */}
           <div className="flex items-center">
             <div className="mx-2 text-sm text-[#636262]">Quality:</div>
             <ToggleGroup
-              value={quality}
-              onChange={setQuality}
+              value={inputs.quality}
+              onChange={(e) =>
+                dispatch({ type: "update", newStates: { quality: e } })
+              }
               disabled={loading}
-              options={QUALITIES[llmname]}
+              options={QUALITIES[inputs.llmname as LLM]}
             />
           </div>
           {/* Dropdown of image style */}
           <div className="flex items-center">
             <div className="mx-2 text-sm text-[#636262]">Style:</div>
             <ToggleGroup
-              value={style}
-              onChange={setStyle}
+              value={inputs.style}
+              onChange={(e) =>
+                dispatch({ type: "update", newStates: { style: e } })
+              }
               disabled={loading}
-              options={STYLES[llmname]}
+              options={STYLES[inputs.llmname as LLM]}
             />
           </div>
         </div>

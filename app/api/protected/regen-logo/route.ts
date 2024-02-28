@@ -33,7 +33,6 @@ export async function POST(req: Request) {
       size: logo.img_size,
       style: logo.img_style,
     };
-    const created_at = new Date().toISOString();
 
     client.images.generate(llm_params).then(async (res) => {
       const raw_img_url = res.data[0].url;
