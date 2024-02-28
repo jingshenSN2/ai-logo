@@ -1,16 +1,16 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FaDownload, FaExclamationTriangle, FaSpinner } from "react-icons/fa";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FaDownload, FaSpinner } from "react-icons/fa";
+import CopyToClipboard from "react-copy-to-clipboard";
 import Image from "next/image";
 import { Logo } from "@/types/logo";
+import TShirtBackground from "@/public/tshirt-background.png";
 import { toast } from "sonner";
 import { useState } from "react";
-
-import TShirtBackground from "@/public/tshirt-background.png";
 
 interface ItemProps {
   logo: Logo;
@@ -73,15 +73,16 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
   return (
     <div
       key={index}
-      className="rounded-xl overflow-hidden mb-4 inline-block border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
+      className="rounded-xl overflow-hidden mb-4 border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
     >
       {logo.generating ? (
-        <div className="py-20 bg-black bg-opacity-50 flex flex-col items-center justify-center">
+        <div className="py-5 bg-black bg-opacity-50 flex flex-col items-center justify-center aspect-[14/8]">
           <FaSpinner className="animate-spin text-white text-4xl" />
           <p className="text-white text-2xl font-bold mt-2">Generating...</p>
         </div>
       ) : logo.img_url === "" ? (
-        <div className="py-20 bg-black bg-opacity-50 flex flex-col items-center justify-center">
+        <div className="py-5 bg-black bg-opacity-50 flex flex-col items-center justify-center aspect-[14/8]">
+          <FaExclamationTriangle className="text-white text-4xl" />
           <p className="text-white text-2xl font-bold mt-2">Generate failed</p>
         </div>
       ) : (
@@ -113,7 +114,14 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
       )}
 
       <div className="px-5 py-4 sm:px-6">
-        <p className="flex-col text-[#808080]">{logo.img_description}</p>
+        <CopyToClipboard
+          text={logo.img_description}
+          onCopy={() => toast.success("Copied")}
+        >
+          <p className="text-[#808080] truncate w-full cursor-pointer">
+            {logo.img_description}
+          </p>
+        </CopyToClipboard>
         <div className="flex items-start mb-5 mt-6 flex-wrap gap-2 md:mb-6 lg:mb-8">
           <div className="flex flex-wrap gap-2 flex-1">
             <Badge variant="secondary">{logo.img_size}</Badge>

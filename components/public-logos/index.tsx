@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Logo } from "@/types/logo";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import CopyToClipboard from "react-copy-to-clipboard";
 
 interface ItemProps {
   logo: Logo;
@@ -18,7 +19,7 @@ function PublicLogoItem({ logo, index }: ItemProps) {
   return (
     <div
       key={index}
-      className="rounded-xl overflow-hidden mb-4 inline-block border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
+      className="rounded-xl overflow-hidden mb-4 border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
     >
       <Image
         src={logo.img_url}
@@ -30,7 +31,14 @@ function PublicLogoItem({ logo, index }: ItemProps) {
       />
 
       <div className="px-5 py-8 sm:px-6">
-        <p className="flex-col text-[#808080]">{logo.img_description}</p>
+        <CopyToClipboard
+          text={logo.img_description}
+          onCopy={() => toast.success("Copied")}
+        >
+          <p className="text-[#808080] truncate w-full cursor-pointer">
+            {logo.img_description}
+          </p>
+        </CopyToClipboard>
         <div className="flex items-start mb-5 mt-6 flex-wrap gap-2 md:mb-6 lg:mb-8">
           <div className="flex flex-wrap gap-2 flex-1">
             <Badge variant="secondary">{logo.img_size}</Badge>
