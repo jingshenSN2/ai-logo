@@ -116,3 +116,22 @@ export async function getUserLogos(user_id: string): Promise<Logo[]> {
   }
   return [];
 }
+
+export async function getUserCredits(user_id: string): Promise<UserCredits> {
+  let user_credits: UserCredits = {
+    total_credits: 10,
+    used_credits: 0,
+    left_credits: 0,
+  };
+  try {
+    const user = await findUser(user_id);
+    if (user) {
+      user_credits.used_credits = user.logos.length;
+      user_credits.left_credits =
+        user_credits.total_credits - user_credits.used_credits;
+    }
+  } catch (e) {
+    console.log("get user credits failed: ", e);
+  }
+  return user_credits;
+}

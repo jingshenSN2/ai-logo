@@ -1,14 +1,11 @@
 import { respData, respErr } from "@/lib/resp";
-import { v4 } from "uuid";
 
 import { ImageGenerateParams } from "openai/resources/images.mjs";
-import { User } from "@/types/user";
-import { Logo } from "@/types/logo";
 import { currentUser } from "@clerk/nextjs";
 import { downloadAndUploadImage } from "@/lib/s3";
 import { getOpenAIClient } from "@/services/openai";
-import { getUserCredits, saveUser } from "@/services/user";
-import { findUser, getLogo, insertLogo, updateLogo } from "@/models/user_logo";
+
+import { getLogo, updateLogo } from "@/models/user_logo";
 
 export async function POST(req: Request) {
   const client = getOpenAIClient();

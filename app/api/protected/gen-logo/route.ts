@@ -7,8 +7,13 @@ import { Logo } from "@/types/logo";
 import { currentUser } from "@clerk/nextjs";
 import { downloadAndUploadImage } from "@/lib/s3";
 import { getOpenAIClient } from "@/services/openai";
-import { getUserCredits, saveUser } from "@/services/user";
-import { findUser, insertLogo, updateLogo } from "@/models/user_logo";
+import { saveUser } from "@/services/user";
+import {
+  findUser,
+  getUserCredits,
+  insertLogo,
+  updateLogo,
+} from "@/models/user_logo";
 
 export async function POST(req: Request) {
   const client = getOpenAIClient();
