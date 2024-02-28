@@ -1,16 +1,16 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
+import { useState } from "react";
+import CopyToClipboard from "react-copy-to-clipboard";
 import { FaDownload, FaExclamationTriangle, FaSpinner } from "react-icons/fa";
+import { toast } from "sonner";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import CopyToClipboard from "react-copy-to-clipboard";
-import Image from "next/image";
-import { Logo } from "@/types/logo";
 import TShirtBackground from "@/public/tshirt-background.png";
-import { toast } from "sonner";
-import { useState } from "react";
+import { Logo } from "@/types/logo";
 
 interface ItemProps {
   logo: Logo;

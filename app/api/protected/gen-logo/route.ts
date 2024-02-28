@@ -1,19 +1,19 @@
-import { respData, respErr } from "@/lib/resp";
+import { ImageGenerateParams } from "openai/resources/images.mjs";
 import { v4 } from "uuid";
 
-import { ImageGenerateParams } from "openai/resources/images.mjs";
-import { User } from "@/types/user";
-import { Logo } from "@/types/logo";
-import { currentUser } from "@clerk/nextjs";
+import { respData, respErr } from "@/lib/resp";
 import { downloadAndUploadImage } from "@/lib/s3";
-import { getOpenAIClient } from "@/services/openai";
-import { saveUser } from "@/services/user";
 import {
   findUser,
   getUserCredits,
   insertLogo,
   updateLogo,
 } from "@/models/user_logo";
+import { getOpenAIClient } from "@/services/openai";
+import { saveUser } from "@/services/user";
+import { Logo } from "@/types/logo";
+import { User } from "@/types/user";
+import { currentUser } from "@clerk/nextjs";
 
 export async function POST(req: Request) {
   const client = getOpenAIClient();

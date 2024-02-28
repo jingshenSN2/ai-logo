@@ -1,7 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import * as React from "react";
-import { SignOutButton } from "@clerk/nextjs";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -10,9 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "@/types/user";
-import { useRouter } from "next/navigation";
+import { SignOutButton } from "@clerk/nextjs";
 
 interface Props {
   user: User;

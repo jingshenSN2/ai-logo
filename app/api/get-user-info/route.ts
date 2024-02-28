@@ -1,9 +1,8 @@
 import { respData, respErr } from "@/lib/resp";
-
+import { findUser, getUserCredits } from "@/models/user_logo";
+import { saveUser } from "@/services/user";
 import { User } from "@/types/user";
 import { currentUser } from "@clerk/nextjs";
-import { saveUser } from "@/services/user";
-import { findUser, getUserCredits } from "@/models/user_logo";
 
 export async function POST(req: Request) {
   const user = await currentUser();

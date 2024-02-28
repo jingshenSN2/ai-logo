@@ -1,13 +1,13 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import Hero from "@/components/hero";
 import Input from "@/components/input";
-import { Logo } from "@/types/logo";
 import UserLogos from "@/components/user-logos";
-import { toast } from "sonner";
 import { AppContext } from "@/contexts/AppContext";
+import { Logo } from "@/types/logo";
 
 export default function () {
   const { user } = useContext(AppContext);

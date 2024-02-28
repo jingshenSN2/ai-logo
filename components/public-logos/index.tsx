@@ -1,14 +1,14 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-import { Badge } from "@/components/ui/badge";
-import { FaDownload } from "react-icons/fa";
 import Image from "next/image";
-import { Logo } from "@/types/logo";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import CopyToClipboard from "react-copy-to-clipboard";
+import { FaDownload } from "react-icons/fa";
+import { toast } from "sonner";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Logo } from "@/types/logo";
 
 interface ItemProps {
   logo: Logo;

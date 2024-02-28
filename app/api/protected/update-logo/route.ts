@@ -1,7 +1,6 @@
 import { respData, respErr } from "@/lib/resp";
 import { toggleLogoPublicity } from "@/models/public_logo";
 import { getLogo } from "@/models/user_logo";
-
 import { currentUser } from "@clerk/nextjs";
 
 export async function POST(req: Request) {

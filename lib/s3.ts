@@ -1,7 +1,8 @@
-import AWS from "aws-sdk";
-import { Readable } from "stream";
-import axios from "axios";
 import fs from "fs";
+import { Readable } from "stream";
+
+import AWS from "aws-sdk";
+import axios from "axios";
 
 AWS.config.update({
   accessKeyId: process.env.AWS_AK,

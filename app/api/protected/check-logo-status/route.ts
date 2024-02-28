@@ -1,7 +1,6 @@
 import { respData, respErr } from "@/lib/resp";
-
-import { currentUser } from "@clerk/nextjs";
 import { getLogo, updateLogo } from "@/models/user_logo";
+import { currentUser } from "@clerk/nextjs";
 
 export async function POST(req: Request) {
   const user = await currentUser();

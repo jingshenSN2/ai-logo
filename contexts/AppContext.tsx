@@ -1,8 +1,8 @@
-import { ContextProviderProps, ContextProviderValue } from "@/types/context";
 import { createContext, useEffect, useState } from "react";
-
-import { User } from "@/types/user";
 import { toast } from "sonner";
+
+import { ContextProviderProps, ContextProviderValue } from "@/types/context";
+import { User } from "@/types/user";
 
 export const AppContext = createContext({} as ContextProviderValue);
 

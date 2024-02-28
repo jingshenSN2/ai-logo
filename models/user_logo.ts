@@ -1,7 +1,7 @@
-import { PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { getDocClient } from "@/models/db";
-import { User, UserCredits } from "@/types/user";
 import { Logo } from "@/types/logo";
+import { User, UserCredits } from "@/types/user";
+import { PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 
 const USER_LOGO_TABLE_NAME = process.env.DYNAMODB_TABLE_PREFIX + "user-logo";
 

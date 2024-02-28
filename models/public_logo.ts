@@ -1,5 +1,5 @@
+import { getDocClient } from "@/models/db";
 import { Logo } from "@/types/logo";
-import { getDocClient } from "./db";
 import {
   DeleteCommand,
   GetCommand,

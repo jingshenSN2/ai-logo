@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   KeyboardEvent,
   useContext,
@@ -8,14 +9,13 @@ import {
   useRef,
   useState,
 } from "react";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { toast } from "sonner";
 
-import { AppContext } from "@/contexts/AppContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup } from "@/components/ui/toggle-group";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { AppContext } from "@/contexts/AppContext";
 
 enum LLM {
   DALL_E_3 = "dall-e-3",
