@@ -1,5 +1,5 @@
 import { respData, respErr } from "@/lib/resp";
-import { getLogo, updateLogo } from "@/models/user_logo";
+import { getLogo } from "@/models/user_logo";
 import { currentUser } from "@clerk/nextjs";
 
 export async function POST(req: Request) {
@@ -19,13 +19,6 @@ export async function POST(req: Request) {
 
     if (!logo) {
       return respErr("logo not found");
-    }
-
-    // If logo is generating after 60s created, do something
-    const created_at = new Date(logo.created_at).getTime();
-    if (logo.generating && Date.now() - created_at > 60 * 1000) {
-      updateLogo(user_id, logo.id, { img_url: "", generating: false });
-      logo.generating = false;
     }
 
     return respData(logo);
