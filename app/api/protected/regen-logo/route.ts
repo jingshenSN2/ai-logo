@@ -34,6 +34,7 @@ export async function POST(req: Request) {
     };
 
     client.images.generate(llm_params).then(async (res) => {
+      console.log("generate logo res: ", res);
       const raw_img_url = res.data[0].url;
       if (!raw_img_url) {
         return respErr("generate logo failed");
