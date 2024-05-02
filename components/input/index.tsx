@@ -19,19 +19,20 @@ import { AppContext } from "@/contexts/AppContext";
 
 enum LLM {
   DALL_E_3 = "dall-e-3",
-  DALL_E_2 = "dall-e-2",
+  // DALL_E_2 = "dall-e-2",
 }
 const IMG_SIZES = {
-  [LLM.DALL_E_3]: ["1792x1024", "1024x1792", "1024x1024"],
-  [LLM.DALL_E_2]: ["1024x1024", "512x512", "256x256"],
+  [LLM.DALL_E_3]: ["1024x1024", "1792x1024"],
+  // [LLM.DALL_E_3]: ["1792x1024", "1024x1792", "1024x1024"],
+  // [LLM.DALL_E_2]: ["1024x1024", "512x512", "256x256"],
 };
 const QUALITIES = {
   [LLM.DALL_E_3]: ["hd", "standard"],
-  [LLM.DALL_E_2]: ["standard"],
+  // [LLM.DALL_E_2]: ["standard"],
 };
 const STYLES = {
   [LLM.DALL_E_3]: ["vivid", "natural"],
-  [LLM.DALL_E_2]: ["natural"],
+  // [LLM.DALL_E_2]: ["natural"],
 };
 
 interface Props {
@@ -211,7 +212,7 @@ export default function ({ fetchLogos }: Props) {
                 });
               }}
               disabled={loading}
-              options={[LLM.DALL_E_3, LLM.DALL_E_2]}
+              options={[LLM.DALL_E_3]}
             />
           </div>
           {/* Dropdown of image size */}
