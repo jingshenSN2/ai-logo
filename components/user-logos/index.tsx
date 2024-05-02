@@ -26,7 +26,6 @@ interface Props {
 
 function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
   const [disable, setDisable] = useState(false);
-  const [retrying, setRetrying] = useState(false);
 
   const onClickPublicOrPrivate = async () => {
     const uri = "/api/protected/update-logo";
@@ -60,9 +59,8 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
       logo_id: logo.id,
     });
 
-    setRetrying(true);
+    logo.generating = true;
     const resp = await fetch(uri, { method: "POST", body: body });
-    setRetrying(false);
 
     if (resp.ok) {
       toast.success("Retrying, please wait for a moment");
@@ -147,9 +145,7 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
               <p>Download unavailable</p>
             </div>
           ) : logo.img_url === "" ? (
-            <Button onClick={onClickRetry} disabled={retrying}>
-              Retry
-            </Button>
+            <Button onClick={onClickRetry}>Retry</Button>
           ) : (
             <a
               href={logo.img_url}
