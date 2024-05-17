@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     }
 
     const llm_params: ImageGenerateParams = {
-      prompt: `A logo about ${description}`,
+      prompt: `A full-color illustration about ${description}, designed to fill the entire square frame with vivid elements, suitable for overlay on any background`,
       model: llm_name || "dall-e-3",
       n: 1,
       quality: quality || "hd",
