@@ -3,6 +3,7 @@ import { v4 } from "uuid";
 
 import { respData, respErr } from "@/lib/resp";
 import { downloadAndUploadImage } from "@/lib/s3";
+import { processAndUploadImage } from "@/lib/s3";
 import {
   findUser,
   getUserCredits,
@@ -91,11 +92,23 @@ export async function POST(req: Request) {
         return respErr("generate logo failed");
       }
       const img_path = `logos/${uuid}.png`;
-      const _ = await downloadAndUploadImage(
+
+      // const _ = await downloadAndUploadImage(
+      //   raw_img_url,
+      //   process.env.S3_BUCKET || "aitist-ailogo-bucket",
+      //   img_path
+      // );
+
+      
+      // TODO: iterate all three t shirts? 
+      const local_t_path = "@/assets/white_t.jpg";
+      const _ = await processAndUploadImage(
         raw_img_url,
+        local_t_path,
         process.env.S3_BUCKET || "aitist-ailogo-bucket",
         img_path
       );
+
       const img_url = `${
         process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"
       }/${img_path}`;
