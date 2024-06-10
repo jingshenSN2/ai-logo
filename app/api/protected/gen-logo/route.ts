@@ -82,6 +82,7 @@ export async function POST(req: Request) {
       created_user_avatar_url: avatarUrl,
       created_user_nickname: nickname || "",
       generating: true,
+      status: "generating",
     };
     await insertLogo(user_id, logo);
 
@@ -102,12 +103,25 @@ export async function POST(req: Request) {
       
       // TODO: iterate all three t shirts? 
       const local_t_path = "@/assets/white_t.jpg";
-      const _ = await processAndUploadImage(
-        raw_img_url,
-        local_t_path,
-        process.env.S3_BUCKET || "aitist-ailogo-bucket",
-        img_path
-      );
+      // const _ = await processAndUploadImage(
+      //   raw_img_url,
+      //   local_t_path,
+      //   process.env.S3_BUCKET || "aitist-ailogo-bucket",
+      //   img_path
+      // );
+
+      processAndUploadImage(
+          raw_img_url, 
+          local_t_path, 
+          process.env.S3_BUCKET || "aitist-ailogo-bucket",
+          img_path)
+      .then(() => {
+        console.log('Image processed and uploaded successfully');
+        logo.status = "success";
+      })
+      .catch(error => {
+        console.error('Failed to process and upload image', error);
+      });
 
       const img_url = `${
         process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"

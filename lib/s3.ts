@@ -1,58 +1,99 @@
 import fs from "fs";
 import { Readable } from "stream";
-
 import AWS from "aws-sdk";
 import axios from "axios";
-
-import * as sharp from 'sharp';
+import sharp from 'sharp';
+import path from 'path';
 
 AWS.config.update({
   accessKeyId: process.env.AWS_AK,
   secretAccessKey: process.env.AWS_SK,
+  // region: 'your-region' // 请确保替换为实际的AWS区域
 });
 
 const s3 = new AWS.S3();
 
+const resolveImagePath = (localImagePath: string): string => {
+  if (localImagePath.startsWith('@/')) {
+    return path.resolve(process.cwd(), localImagePath.replace('@/', ''));
+  }
+  return path.resolve(process.cwd(), localImagePath);
+};
 
-export async function processAndUploadImage(imageUrl: string, localImagePath: string, bucketName: string, s3Key: string) {
+async function fetchImageStream(imageUrl: string): Promise<Readable> {
   try {
- 
-      // Download the generated image
-      const response = await axios({
-        method: "GET",
-        url: imageUrl,
-        responseType: "stream",
-      });
-
-
-      // Read the local image
-      const localImage = sharp(localImagePath);
-
-      // Get metadata of the local image to find dimensions
-      const { width, height } = await localImage.metadata();
-
-      // Overlay the generated image over the local image
-      const overlaidImage = await localImage.composite([{
-          // TODO: can input be image buffer??
-          input: response.data, 
-          // Position the generated image in the center of the local image
-          top: Math.round((height - 300) / 2), // TODO: need to ddjust dimensions based on needs !!
-          left: Math.round((width - 500) / 2),
-      }]).toBuffer();
-
-      const uploadParams = {
-        Bucket: bucketName,
-        Key: s3Key,
-        Body: overlaidImage as Readable,
-      };
-
-      // Upload the overlaid image to S3
-      return s3.upload(uploadParams).promise();
+    const response = await axios({
+      method: "GET",
+      url: imageUrl,
+      responseType: "stream",
+    });
+    return response.data;
   } catch (error) {
-      console.error('Failed to process and upload image:', error);
+    console.error(`Failed to fetch image from ${imageUrl}`, error);
+    throw error;
   }
 }
 
+async function streamToBuffer(stream: Readable): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Uint8Array[] = [];
+    stream.on('data', (chunk) => chunks.push(chunk));
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+    stream.on('error', (err) => reject(err));
+  });
+}
+
+export async function processAndUploadImage(imageUrl: string, localImagePath: string, bucketName: string, s3Key: string) {
+  try {
+    // 下载生成的图像
+    const imageStream = await fetchImageStream(imageUrl);
+
+    // 将流转换为Buffer
+    const imageBuffer = await streamToBuffer(imageStream);
+
+    // 解析路径
+    // const resolvedLocalImagePath = path.resolve(localImagePath)
+    // console.log("dir Name", __dirname);
+    // const resolvedLocalImagePath = path.resolve(__dirname, localImagePath.replace('@', ''));
+    const resolvedLocalImagePath = resolveImagePath(localImagePath);
+    // const resolvedLocalImagePath = path.resolve(process.cwd(), localImagePath.replace('@', ''));
+    // console.log("Resolved local image path:", resolvedLocalImagePath);
+    // log time and path 
+    console.log("Time:", new Date().toISOString(), "Path:", resolvedLocalImagePath);
+    
+
+    // 读取本地图像
+    const localImage = sharp(resolvedLocalImagePath);
+
+    // 获取本地图像的元数据
+    const metadata = await localImage.metadata();
+    const { width, height } = metadata;
+    if (width === undefined || height === undefined) {
+      throw new Error('Failed to get image dimensions');
+    }
+
+    console.log("Local image metadata:", { width, height });
+
+    // 将生成的图像覆盖在本地图像上
+    const overlaidImage = await localImage.composite([{
+      input: imageBuffer,
+      top: Math.round((height - 300) / 2), // 根据需要调整尺寸
+      left: Math.round((width - 500) / 2),
+    }]).toBuffer();
+
+    // 上传合成后的图像到 S3
+    const uploadParams = {
+      Bucket: bucketName,
+      Key: s3Key,
+      Body: overlaidImage,
+    };
+
+    return s3.upload(uploadParams).promise();
+  } catch (error) {
+    console.error('Failed to process and upload image:', error);
+    throw error;
+  }
+}
 
 export async function downloadAndUploadImage(
   imageUrl: string,
@@ -60,36 +101,28 @@ export async function downloadAndUploadImage(
   s3Key: string
 ) {
   try {
-    const response = await axios({
-      method: "GET",
-      url: imageUrl,
-      responseType: "stream",
-    });
+    const imageStream = await fetchImageStream(imageUrl);
 
     const uploadParams = {
       Bucket: bucketName,
       Key: s3Key,
-      Body: response.data as Readable,
+      Body: imageStream,
     };
 
     return s3.upload(uploadParams).promise();
-  } catch (e) {
-    console.log("upload failed:", e);
-    throw e;
+  } catch (error) {
+    console.error("Failed to download and upload image:", error);
+    throw error;
   }
 }
 
 export async function downloadImage(imageUrl: string, outputPath: string) {
   try {
-    const response = await axios({
-      method: "GET",
-      url: imageUrl,
-      responseType: "stream",
-    });
+    const imageStream = await fetchImageStream(imageUrl);
 
     return new Promise((resolve, reject) => {
       const writer = fs.createWriteStream(outputPath);
-      response.data.pipe(writer);
+      imageStream.pipe(writer);
 
       let error: Error | null = null;
       writer.on("error", (err) => {
@@ -104,8 +137,8 @@ export async function downloadImage(imageUrl: string, outputPath: string) {
         }
       });
     });
-  } catch (e) {
-    console.log("upload failed:", e);
-    throw e;
+  } catch (error) {
+    console.error("Failed to download image:", error);
+    throw error;
   }
 }

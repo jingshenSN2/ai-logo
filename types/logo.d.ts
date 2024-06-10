@@ -23,4 +23,6 @@ export interface Logo {
   created_at: string;
   created_user_avatar_url: string;
   created_user_nickname: string;
+  generating: boolean;
+  status: "generating" | "success" | "failed";
 }
