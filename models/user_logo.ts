@@ -126,7 +126,9 @@ export async function getUserCredits(user_id: string): Promise<UserCredits> {
   try {
     const user = await findUser(user_id);
     if (user) {
-      user_credits.used_credits = user.logos.length;
+      // user_credits.used_credits = user.logos.length;  
+      // TODO, if the logo is not generated successfully, the used_credits should not be decreased
+      user_credits.used_credits = user.logos.filter(l => l.status === "success").length;
       user_credits.left_credits =
         user_credits.total_credits - user_credits.used_credits;
     }

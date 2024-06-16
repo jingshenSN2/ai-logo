@@ -25,13 +25,12 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { description, llm_name, img_size, quality, style } =
-      await req.json();
+    const { description, llm_name, img_size, quality, style } = await req.json();
     if (!description) {
       return respErr("invalid params");
     }
 
-    // save user
+    // Save user
     const user_id = user.id;
     const user_email = user.emailAddresses[0].emailAddress;
     const nickname = user.firstName;
@@ -49,20 +48,17 @@ export async function POST(req: Request) {
     const db_user = await findUser(user_id);
     const user_credits = await getUserCredits(user_id);
 
-    if (
-      !db_user?.super_user &&
-      (!user_credits || user_credits.left_credits < 1)
-    ) {
+    if (!db_user?.super_user && (!user_credits || user_credits.left_credits < 1)) {
       return respErr("credits not enough");
     }
 
     const llm_params: ImageGenerateParams = {
-      prompt: `A full-color illustration about ${description}, with **edge-blurred effect**, designed to fill the entire square frame with vivid elements, suitable for overlay on any background`,
+      prompt: `A full-color illustration about ${description}, with **edge-blurred effect**, designed to fill the entire frame with vivid elements, suitable for overlay on any background`,
       model: llm_name || "dall-e-3",
       n: 1,
       quality: quality || "hd",
       response_format: "url",
-      size: img_size || "1792x1024",
+      size: img_size || "540x480",
       style: style || "vivid",
     };
     const created_at = new Date().toISOString();
@@ -73,7 +69,7 @@ export async function POST(req: Request) {
       id: uuid,
       user_email: user_email,
       img_description: description,
-      img_size: img_size || "1792x1024",
+      img_size: img_size || "540x480",
       img_quality: quality || "hd",
       img_style: style || "vivid",
       img_url: "",
@@ -82,6 +78,7 @@ export async function POST(req: Request) {
       created_user_avatar_url: avatarUrl,
       created_user_nickname: nickname || "",
       generating: true,
+      status: "generating",
     };
     await insertLogo(user_id, logo);
 
@@ -92,32 +89,31 @@ export async function POST(req: Request) {
         return respErr("generate logo failed");
       }
       const img_path = `logos/${uuid}.png`;
+      console.log("img_path: ", img_path);
 
-      // const _ = await downloadAndUploadImage(
-      //   raw_img_url,
-      //   process.env.S3_BUCKET || "aitist-ailogo-bucket",
-      //   img_path
-      // );
-
-      
-      // TODO: iterate all three t shirts? 
       const local_t_path = "@/assets/white_t.jpg";
-      const _ = await processAndUploadImage(
-        raw_img_url,
-        local_t_path,
-        process.env.S3_BUCKET || "aitist-ailogo-bucket",
-        img_path
-      );
+      try {
+        await processAndUploadImage(raw_img_url, local_t_path, process.env.S3_BUCKET || "aitist-ailogo-bucket", img_path);
+        console.log('Image processed and uploaded successfully');
+        logo.status = "success";
+      } catch (error) {
+        console.error('Failed to process and upload image', error);
+        logo.status = "failed";
+      }
 
-      const img_url = `${
-        process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"
-      }/${img_path}`;
+      const img_url = `${process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"}/${img_path}`;
+      logo.img_url = img_url;
+      logo.generating = false;
 
-      // update logo obj and save to db
-      updateLogo(user_id, uuid, { img_url, generating: false });
+      // Update logo obj and save to db
+      await updateLogo(user_id, uuid, logo);
+
+      // Update user info and save
+      userInfo.logos.push(logo);
+      await saveUser(userInfo);
     });
 
-    // return immediately before image is generated
+    // Return immediately before image is generated
     return respData(logo);
   } catch (e) {
     console.log("generate logo failed: ", e);
