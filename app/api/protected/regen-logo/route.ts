@@ -1,7 +1,7 @@
 import { ImageGenerateParams } from "openai/resources/images.mjs";
 
 import { respData, respErr } from "@/lib/resp";
-import { downloadAndUploadImage } from "@/lib/s3";
+import { processAndUploadImage } from "@/lib/s3";
 import { getLogo, updateLogo } from "@/models/user_logo";
 import { getOpenAIClient } from "@/services/openai";
 import { currentUser } from "@clerk/nextjs";
@@ -32,6 +32,8 @@ export async function POST(req: Request) {
       size: logo.img_size,
       style: logo.img_style,
     };
+    // update logo status to generating
+    updateLogo(user_id, logo_id, { status: "generating" });
 
     client.images.generate(llm_params).then(async (res) => {
       console.log("generate logo res: ", res);
@@ -40,17 +42,24 @@ export async function POST(req: Request) {
         return respErr("generate logo failed");
       }
       const img_path = `logos/${logo_id}.png`;
-      const _ = await downloadAndUploadImage(
-        raw_img_url,
-        process.env.S3_BUCKET || "aitist-ailogo-bucket",
-        img_path
-      );
-      const img_url = `${
-        process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"
-      }/${img_path}`;
+      console.log("img_path: ", img_path);
+
+      try {
+        await processAndUploadImage(
+          raw_img_url,
+          "public/white_t.jpg",
+          process.env.S3_BUCKET || "aitist-ailogo-bucket",
+          img_path
+        );
+        console.log("Image processed and uploaded successfully");
+        logo.status = "success";
+      } catch (error) {
+        console.error("Failed to process and upload image", error);
+        logo.status = "failed";
+      }
 
       // update logo obj and save to db
-      updateLogo(user_id, logo_id, { img_url, generating: false });
+      updateLogo(user_id, logo_id, { status: logo.status });
     });
 
     // return immediately before image is generated

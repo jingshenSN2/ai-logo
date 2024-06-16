@@ -59,7 +59,7 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
       logo_id: logo.id,
     });
 
-    logo.generating = true;
+    logo.status = "generating";
     const resp = await fetch(uri, { method: "POST", body: body });
 
     if (resp.ok) {
@@ -68,17 +68,20 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
     }
   };
 
+  const isGenerating = logo.status === "generating";
+  const isFailed = logo.status === "failed";
+
   return (
     <div
       key={index}
       className="rounded-xl overflow-hidden mb-4 border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
     >
-      {logo.generating ? (
+      {isGenerating ? (
         <div className="py-5 bg-black bg-opacity-50 flex flex-col items-center justify-center aspect-[14/8]">
           <FaSpinner className="animate-spin text-white text-4xl" />
           <p className="text-white text-2xl font-bold mt-2">Generating...</p>
         </div>
-      ) : logo.img_url === "" ? (
+      ) : isFailed ? (
         <div className="py-5 bg-black bg-opacity-50 flex flex-col items-center justify-center aspect-[14/8]">
           <FaExclamationTriangle className="text-white text-4xl" />
           <p className="text-white text-2xl font-bold mt-2">Generate failed</p>
@@ -92,23 +95,6 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
           loading="lazy"
           className="aspect-[14/8] object-contain"
         />
-        // <div className="relative max-w-[400px] max-h-[518px]">
-        //   <Image
-        //     src={TShirtBackground}
-        //     alt="tshirt background"
-        //     width={400}
-        //     height={518}
-        //     loading="lazy"
-        //   />
-        //   <Image
-        //     src={logo.img_url}
-        //     alt={logo.img_description}
-        //     width={200}
-        //     height={200}
-        //     loading="lazy"
-        //     className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[40%]"
-        //   />
-        // </div>
       )}
 
       <div className="px-5 py-4 sm:px-6">
@@ -140,11 +126,11 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
           </Avatar>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-4">
-          {logo.generating ? (
+          {isGenerating ? (
             <div className="flex items-center max-w-full gap-2.5 text-sm font-bold uppercase text-gray-500">
               <p>Download unavailable</p>
             </div>
-          ) : logo.img_url === "" ? (
+          ) : isFailed ? (
             <Button onClick={onClickRetry}>Retry</Button>
           ) : (
             <a
@@ -157,7 +143,7 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
               </p>
             </a>
           )}
-          {!logo.generating && logo.img_url !== "" && (
+          {!isGenerating && !isFailed && (
             <Button onClick={onClickPublicOrPrivate} disabled={disable}>
               Public/Private
             </Button>

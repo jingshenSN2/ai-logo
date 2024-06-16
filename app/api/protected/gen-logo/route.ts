@@ -2,7 +2,6 @@ import { ImageGenerateParams } from "openai/resources/images.mjs";
 import { v4 } from "uuid";
 
 import { respData, respErr } from "@/lib/resp";
-import { downloadAndUploadImage } from "@/lib/s3";
 import { processAndUploadImage } from "@/lib/s3";
 import {
   findUser,
@@ -25,7 +24,8 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { description, llm_name, img_size, quality, style } = await req.json();
+    const { description, llm_name, img_size, quality, style } =
+      await req.json();
     if (!description) {
       return respErr("invalid params");
     }
@@ -48,7 +48,10 @@ export async function POST(req: Request) {
     const db_user = await findUser(user_id);
     const user_credits = await getUserCredits(user_id);
 
-    if (!db_user?.super_user && (!user_credits || user_credits.left_credits < 1)) {
+    if (
+      !db_user?.super_user &&
+      (!user_credits || user_credits.left_credits < 1)
+    ) {
       return respErr("credits not enough");
     }
 
@@ -77,7 +80,6 @@ export async function POST(req: Request) {
       created_at: created_at,
       created_user_avatar_url: avatarUrl,
       created_user_nickname: nickname || "",
-      generating: true,
       status: "generating",
     };
     await insertLogo(user_id, logo);
@@ -91,19 +93,25 @@ export async function POST(req: Request) {
       const img_path = `logos/${uuid}.png`;
       console.log("img_path: ", img_path);
 
-      const local_t_path = "@/assets/white_t.jpg";
       try {
-        await processAndUploadImage(raw_img_url, local_t_path, process.env.S3_BUCKET || "aitist-ailogo-bucket", img_path);
-        console.log('Image processed and uploaded successfully');
+        await processAndUploadImage(
+          raw_img_url,
+          "public/white_t.jpg",
+          process.env.S3_BUCKET || "aitist-ailogo-bucket",
+          img_path
+        );
+        console.log("Image processed and uploaded successfully");
         logo.status = "success";
       } catch (error) {
-        console.error('Failed to process and upload image', error);
+        console.error("Failed to process and upload image", error);
         logo.status = "failed";
       }
 
-      const img_url = `${process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"}/${img_path}`;
+      const img_url = `${
+        process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"
+      }/${img_path}`;
       logo.img_url = img_url;
-      logo.generating = false;
+      logo.status = "generating";
 
       // Update logo obj and save to db
       await updateLogo(user_id, uuid, logo);
