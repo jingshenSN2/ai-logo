@@ -3,7 +3,7 @@ import { Readable } from "stream";
 import AWS from "aws-sdk";
 import axios from "axios";
 import sharp from 'sharp';
-import path from 'path';
+import path from "path";
 
 AWS.config.update({
   accessKeyId: process.env.AWS_AK,
@@ -43,42 +43,55 @@ async function streamToBuffer(stream: Readable): Promise<Buffer> {
   });
 }
 
+async function fetchImageAndMetadata(url: string) {
+  try {
+    const response = await axios({
+      method: "GET",
+      url: url,
+      responseType: "stream",
+    });
+    const imageBuffer = await streamToBuffer(response.data);
+    const metadata = await sharp(imageBuffer).metadata();
+    return { imageBuffer, metadata };
+  } catch (error) {
+    console.error(`Failed to fetch image and metadata from ${url}`, error);
+    throw error;
+  }
+}
+
 export async function processAndUploadImage(imageUrl: string, localImagePath: string, bucketName: string, s3Key: string) {
   try {
-    // 下载生成的图像
-    const imageStream = await fetchImageStream(imageUrl);
-
-    // 将流转换为Buffer
-    const imageBuffer = await streamToBuffer(imageStream);
+    // 下载生成的图像及其元数据
+    const { imageBuffer, metadata: downloadedImageMetadata } = await fetchImageAndMetadata(imageUrl);
+    if (!imageBuffer) {
+      throw new Error('Failed to convert image stream to buffer');
+    }
 
     // 解析路径
-    // const resolvedLocalImagePath = path.resolve(localImagePath)
-    // console.log("dir Name", __dirname);
-    // const resolvedLocalImagePath = path.resolve(__dirname, localImagePath.replace('@', ''));
     const resolvedLocalImagePath = resolveImagePath(localImagePath);
-    // const resolvedLocalImagePath = path.resolve(process.cwd(), localImagePath.replace('@', ''));
-    // console.log("Resolved local image path:", resolvedLocalImagePath);
-    // log time and path 
-    console.log("Time:", new Date().toISOString(), "Path:", resolvedLocalImagePath);
-    
+    console.log("Resolved local image path:", resolvedLocalImagePath);
 
     // 读取本地图像
     const localImage = sharp(resolvedLocalImagePath);
-
-    // 获取本地图像的元数据
-    const metadata = await localImage.metadata();
-    const { width, height } = metadata;
-    if (width === undefined || height === undefined) {
-      throw new Error('Failed to get image dimensions');
+    const localMetadata = await localImage.metadata();
+    const { width: localWidth, height: localHeight } = localMetadata;
+    if (localWidth === undefined || localHeight === undefined) {
+      throw new Error('Failed to get local image dimensions');
     }
 
-    console.log("Local image metadata:", { width, height });
+    const { width: downloadedWidth, height: downloadedHeight } = downloadedImageMetadata;
+    if (downloadedWidth === undefined || downloadedHeight === undefined) {
+      throw new Error('Failed to get downloaded image dimensions');
+    }
 
-    // 将生成的图像覆盖在本地图像上
+    console.log("Local image metadata:", { localWidth, localHeight });
+    console.log("Downloaded image metadata:", { downloadedWidth, downloadedHeight });
+
+    // 将生成的图像覆盖在本地图像上，确保正中间
     const overlaidImage = await localImage.composite([{
       input: imageBuffer,
-      top: Math.round((height - 300) / 2), // 根据需要调整尺寸
-      left: Math.round((width - 500) / 2),
+      top: Math.round((localHeight - downloadedHeight) / 2),
+      left: Math.round((localWidth - downloadedWidth) / 2),
     }]).toBuffer();
 
     // 上传合成后的图像到 S3
@@ -88,7 +101,9 @@ export async function processAndUploadImage(imageUrl: string, localImagePath: st
       Body: overlaidImage,
     };
 
-    return s3.upload(uploadParams).promise();
+    const uploadResult = await s3.upload(uploadParams).promise();
+    console.log("Image uploaded successfully:", uploadResult);
+    return uploadResult;
   } catch (error) {
     console.error('Failed to process and upload image:', error);
     throw error;
