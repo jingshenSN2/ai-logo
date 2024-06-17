@@ -1,9 +1,10 @@
 import fs from "fs";
+import path from "path";
 import { Readable } from "stream";
+
 import AWS from "aws-sdk";
 import axios from "axios";
-import sharp from 'sharp';
-import path from "path";
+import sharp from "sharp";
 
 AWS.config.update({
   accessKeyId: process.env.AWS_AK,
@@ -11,14 +12,12 @@ AWS.config.update({
   // region: 'your-region' // 请确保替换为实际的AWS区域
 });
 
-const s3 = new AWS.S3();
+const tshirt = "white_t.jpg";
+const tshirtImage = Buffer.from(
+  fs.readFileSync(path.resolve(process.cwd(), "public", tshirt))
+);
 
-const resolveImagePath = (localImagePath: string): string => {
-  if (localImagePath.startsWith('@/')) {
-    return path.resolve(process.cwd(), localImagePath.replace('@/', ''));
-  }
-  return path.resolve(process.cwd(), localImagePath);
-};
+const s3 = new AWS.S3();
 
 async function fetchImageStream(imageUrl: string): Promise<Readable> {
   try {
@@ -37,9 +36,9 @@ async function fetchImageStream(imageUrl: string): Promise<Readable> {
 async function streamToBuffer(stream: Readable): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
-    stream.on('data', (chunk) => chunks.push(chunk));
-    stream.on('end', () => resolve(Buffer.concat(chunks)));
-    stream.on('error', (err) => reject(err));
+    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+    stream.on("error", (err) => reject(err));
   });
 }
 
@@ -59,40 +58,50 @@ async function fetchImageAndMetadata(url: string) {
   }
 }
 
-export async function processAndUploadImage(imageUrl: string, localImagePath: string, bucketName: string, s3Key: string) {
+export async function processAndUploadImage(
+  imageUrl: string,
+  localImagePath: string,
+  bucketName: string,
+  s3Key: string
+) {
   try {
     // 下载生成的图像及其元数据
-    const { imageBuffer, metadata: downloadedImageMetadata } = await fetchImageAndMetadata(imageUrl);
+    const { imageBuffer, metadata: downloadedImageMetadata } =
+      await fetchImageAndMetadata(imageUrl);
     if (!imageBuffer) {
-      throw new Error('Failed to convert image stream to buffer');
+      throw new Error("Failed to convert image stream to buffer");
     }
 
-    // 解析路径
-    const resolvedLocalImagePath = resolveImagePath(localImagePath);
-    console.log("Resolved local image path:", resolvedLocalImagePath);
-
     // 读取本地图像
-    const localImage = sharp(resolvedLocalImagePath);
+    const localImage = sharp(tshirtImage);
     const localMetadata = await localImage.metadata();
     const { width: localWidth, height: localHeight } = localMetadata;
     if (localWidth === undefined || localHeight === undefined) {
-      throw new Error('Failed to get local image dimensions');
+      throw new Error("Failed to get local image dimensions");
     }
 
-    const { width: downloadedWidth, height: downloadedHeight } = downloadedImageMetadata;
+    const { width: downloadedWidth, height: downloadedHeight } =
+      downloadedImageMetadata;
     if (downloadedWidth === undefined || downloadedHeight === undefined) {
-      throw new Error('Failed to get downloaded image dimensions');
+      throw new Error("Failed to get downloaded image dimensions");
     }
 
     console.log("Local image metadata:", { localWidth, localHeight });
-    console.log("Downloaded image metadata:", { downloadedWidth, downloadedHeight });
+    console.log("Downloaded image metadata:", {
+      downloadedWidth,
+      downloadedHeight,
+    });
 
     // 将生成的图像覆盖在本地图像上，确保正中间
-    const overlaidImage = await localImage.composite([{
-      input: imageBuffer,
-      top: Math.round((localHeight - downloadedHeight) / 2),
-      left: Math.round((localWidth - downloadedWidth) / 2),
-    }]).toBuffer();
+    const overlaidImage = await localImage
+      .composite([
+        {
+          input: imageBuffer,
+          top: Math.round((localHeight - downloadedHeight) / 2),
+          left: Math.round((localWidth - downloadedWidth) / 2),
+        },
+      ])
+      .toBuffer();
 
     // 上传合成后的图像到 S3
     const uploadParams = {
@@ -105,7 +114,7 @@ export async function processAndUploadImage(imageUrl: string, localImagePath: st
     console.log("Image uploaded successfully:", uploadResult);
     return uploadResult;
   } catch (error) {
-    console.error('Failed to process and upload image:', error);
+    console.error("Failed to process and upload image:", error);
     throw error;
   }
 }
