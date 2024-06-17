@@ -1,6 +1,7 @@
 import { ImageGenerateParams } from "openai/resources/images.mjs";
 import { v4 } from "uuid";
 
+import { promptFormatter } from "@/lib/prompt";
 import { respData, respErr } from "@/lib/resp";
 import { processAndUploadImage } from "@/lib/s3";
 import {
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
     }
 
     const llm_params: ImageGenerateParams = {
-      prompt: `A full-color illustration about ${description}, with **edge-blurred effect**, designed to fill the entire frame with vivid elements, suitable for overlay on any background`,
+      prompt: promptFormatter(description),
       model: llm_name || "dall-e-3",
       n: 1,
       quality: quality || "hd",
@@ -68,6 +69,10 @@ export async function POST(req: Request) {
 
     // Create logo obj and save to db
     const uuid = v4();
+    const img_path = `logos/${uuid}.png`;
+    const img_url = `${
+      process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"
+    }/${img_path}`;
     const logo: Logo = {
       id: uuid,
       user_email: user_email,
@@ -75,7 +80,7 @@ export async function POST(req: Request) {
       img_size: img_size || "540x480",
       img_quality: quality || "hd",
       img_style: style || "vivid",
-      img_url: "",
+      img_url: img_url,
       llm_name: llm_name,
       created_at: created_at,
       created_user_avatar_url: avatarUrl,
@@ -90,13 +95,11 @@ export async function POST(req: Request) {
       if (!raw_img_url) {
         return respErr("generate logo failed");
       }
-      const img_path = `logos/${uuid}.png`;
       console.log("img_path: ", img_path);
 
       try {
         await processAndUploadImage(
           raw_img_url,
-          "public/white_t.jpg",
           process.env.S3_BUCKET || "aitist-ailogo-bucket",
           img_path
         );
@@ -107,14 +110,8 @@ export async function POST(req: Request) {
         logo.status = "failed";
       }
 
-      const img_url = `${
-        process.env.S3_CLOUDFRONT_URL || "https://d3flt886hm4b5c.cloudfront.net"
-      }/${img_path}`;
-      logo.img_url = img_url;
-      logo.status = "generating";
-
       // Update logo obj and save to db
-      await updateLogo(user_id, uuid, logo);
+      await updateLogo(user_id, uuid, { status: logo.status });
 
       // Update user info and save
       userInfo.logos.push(logo);

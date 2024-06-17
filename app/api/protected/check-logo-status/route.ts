@@ -1,5 +1,5 @@
 import { respData, respErr } from "@/lib/resp";
-import { getLogo } from "@/models/user_logo";
+import { getLogo, updateLogo } from "@/models/user_logo";
 import { currentUser } from "@clerk/nextjs";
 
 export async function POST(req: Request) {
@@ -19,6 +19,18 @@ export async function POST(req: Request) {
 
     if (!logo) {
       return respErr("logo not found");
+    }
+
+    // Check if the logo is timed out
+    if (logo.status === "generating") {
+      const now = new Date();
+      const created = new Date(logo.created_at);
+      const diff = now.getTime() - created.getTime();
+      if (diff > 10 * 60 * 1000) {
+        // 10 minutes timeout
+        logo.status = "failed";
+        await updateLogo(user_id, logo.id, { status: "failed" });
+      }
     }
 
     return respData(logo);

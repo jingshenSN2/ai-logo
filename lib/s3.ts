@@ -1,9 +1,9 @@
 import fs from "fs";
-import path from "path";
 import { Readable } from "stream";
 
 import AWS from "aws-sdk";
 import axios from "axios";
+import Tshirt from "public/white_t.jpg";
 import sharp from "sharp";
 
 AWS.config.update({
@@ -11,11 +11,6 @@ AWS.config.update({
   secretAccessKey: process.env.AWS_SK,
   // region: 'your-region' // 请确保替换为实际的AWS区域
 });
-
-const tshirt = "white_t.jpg";
-const tshirtImage = Buffer.from(
-  fs.readFileSync(path.resolve(process.cwd(), "public", tshirt))
-);
 
 const s3 = new AWS.S3();
 
@@ -60,7 +55,6 @@ async function fetchImageAndMetadata(url: string) {
 
 export async function processAndUploadImage(
   imageUrl: string,
-  localImagePath: string,
   bucketName: string,
   s3Key: string
 ) {
@@ -73,7 +67,12 @@ export async function processAndUploadImage(
     }
 
     // 读取本地图像
-    const localImage = sharp(tshirtImage);
+    const baseUrl = process.env.VERCEL_URL
+      ? "https://" + process.env.VERCEL_URL
+      : "http://localhost:3000";
+    const resp = await fetch(`${baseUrl}/${Tshirt.src}`);
+    const buffer = await resp.arrayBuffer();
+    const localImage = sharp(buffer);
     const localMetadata = await localImage.metadata();
     const { width: localWidth, height: localHeight } = localMetadata;
     if (localWidth === undefined || localHeight === undefined) {

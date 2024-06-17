@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -13,7 +13,7 @@ const nextConfig = {
     ],
   },
   webpack: (config) => {
-    config.resolve.alias['@'] = path.resolve(__dirname, '.');
+    config.resolve.alias["@"] = path.resolve(__dirname, ".");
     return config;
   },
 };
