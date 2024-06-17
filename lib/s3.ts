@@ -67,9 +67,8 @@ export async function processAndUploadImage(
     }
 
     // 读取本地图像
-    const baseUrl = process.env.VERCEL_URL
-      ? "https://" + process.env.VERCEL_URL
-      : "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
     const resp = await fetch(`${baseUrl}/${Tshirt.src}`);
     const buffer = await resp.arrayBuffer();
     const localImage = sharp(buffer);
