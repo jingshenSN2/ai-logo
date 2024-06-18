@@ -21,18 +21,6 @@ export async function POST(req: Request) {
       return respErr("logo not found");
     }
 
-    // Check if the logo is timed out
-    if (logo.status === "generating") {
-      const now = new Date();
-      const created = new Date(logo.created_at);
-      const diff = now.getTime() - created.getTime();
-      if (diff > 10 * 60 * 1000) {
-        // 10 minutes timeout
-        logo.status = "failed";
-        await updateLogo(user_id, logo.id, { status: "failed" });
-      }
-    }
-
     return respData(logo);
   } catch (e) {
     console.log("check logo status failed: ", e);
