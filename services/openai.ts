@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-const USE_MOCK = true;
+const USE_MOCK = process.env.USE_MOCK === "true";
 
 function mockOpenAIClient() {
   return {

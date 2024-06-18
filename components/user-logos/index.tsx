@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import TShirtBackground from "@/public/tshirt-background.png";
 import { Logo } from "@/types/logo";
 
 interface ItemProps {
@@ -88,7 +87,8 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
         </div>
       ) : (
         <Image
-          src={logo.img_url}
+          // src={logo.img_url}
+          src={logo.img_url.replace(".png", "_white.png")}
           alt={logo.img_description}
           width={350}
           height={200}

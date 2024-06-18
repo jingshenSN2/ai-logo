@@ -1,9 +1,9 @@
 import { ImageGenerateParams } from "openai/resources/images.mjs";
 import { v4 } from "uuid";
 
+import { processAndUploadImage } from "@/lib/image";
 import { promptFormatter } from "@/lib/prompt";
 import { respData, respErr } from "@/lib/resp";
-import { processAndUploadImage } from "@/lib/s3";
 import {
   findUser,
   getUserCredits,
