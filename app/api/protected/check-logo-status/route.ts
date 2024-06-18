@@ -1,5 +1,5 @@
 import { respData, respErr } from "@/lib/resp";
-import { getLogo } from "@/models/user_logo";
+import { getLogo, updateLogo } from "@/models/user_logo";
 import { currentUser } from "@clerk/nextjs";
 
 export async function POST(req: Request) {
