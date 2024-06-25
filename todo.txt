@@ -1,0 +1,6 @@
+1. how to debug without front end
+2. merge two images, save it somewhere. (axis, sharp)
+
+
+1. 只展示前端衣服
+
