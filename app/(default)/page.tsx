@@ -34,7 +34,7 @@ export default function Page() {
           setUserLogos(res.data);
           // Check if any of the logos are still generating
           for (const logo of res.data) {
-            if (logo.generating) {
+            if (logo.status === "generating") {
               setPollLogoID(logo.id);
               break;
             }
@@ -55,7 +55,7 @@ export default function Page() {
     const resp = await fetch(uri, { method: "POST", body: body });
     if (resp.ok) {
       const { data } = await resp.json();
-      if (!data.generating) {
+      if (data.status !== "generating") {
         console.log("logo is ready");
         setPollLogoID("");
         fetchLogos();
