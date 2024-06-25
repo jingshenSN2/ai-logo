@@ -11,8 +11,8 @@ import ImageUploader from "@/components/ImageUploader";
 import { AppContext } from "@/contexts/AppContext";
 import { Logo } from "@/types/logo";
 
-// 动态导入 ImageEditor 以确保仅在客户端加载
-const ImageEditor = dynamic(() => import('@/components/ImageEditor'), { ssr: false });
+// 动态导入 ImageCanvas 以确保仅在客户端加载
+const ImageCanvas = dynamic(() => import('@/components/ImageCanvas'), { ssr: false });
 
 export default function Page() {
   const { user } = useContext(AppContext);
@@ -20,6 +20,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [pollLogoID, setPollLogoID] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null); // State to hold the selected image file
+  const [backgroundColor, setBackgroundColor] = useState("white_t"); // State to hold the background color
 
   const fetchLogos = async function () {
     try {
@@ -77,25 +78,49 @@ export default function Page() {
     return () => clearInterval(pollInterval);
   }, [pollLogoID]);
 
+  const handleBackgroundColorChange = (color) => {
+    setBackgroundColor(color);
+  };
+
   return (
-    <div className="md:mt-16">
-      <div className="max-w-3xl mx-auto">
+    <div className="md:mt-16 flex">
+      <div className="flex-1">
+        <ImageCanvas imageFile={imageFile} backgroundColor={backgroundColor} />
+      </div>
+      <div className="max-w-3xl mx-auto flex-1">
         <Hero />
         <div className="mx-auto my-4 flex max-w-lg justify-center">
           <Input fetchLogos={fetchLogos} />
         </div>
+        <h3 className="text-2xl font-bold">Your logos</h3>
+        <div className="pt-0">
+          <UserLogos
+            logos={userLogos}
+            loading={loading}
+            setPollLogoID={setPollLogoID}
+          />
+        </div>
+        <h3 className="text-2xl font-bold">Upload and Edit Image</h3>
+        <ImageUploader onImageUpload={setImageFile} />
+        <div className="flex items-center mt-4">
+          <span className="mr-2">Background:</span>
+          <div
+            className={`w-6 h-6 rounded-full bg-white border ${backgroundColor === 'white_t' ? 'border-black' : ''}`}
+            onClick={() => handleBackgroundColorChange('white_t')}
+            style={{ cursor: 'pointer' }}
+          />
+          <div
+            className={`w-6 h-6 rounded-full bg-black border ml-2 ${backgroundColor === 'black_t' ? 'border-black' : ''}`}
+            onClick={() => handleBackgroundColorChange('black_t')}
+            style={{ cursor: 'pointer' }}
+          />
+          <div
+            className={`w-6 h-6 rounded-full bg-gray-500 border ml-2 ${backgroundColor === 'grey_t' ? 'border-black' : ''}`}
+            onClick={() => handleBackgroundColorChange('grey_t')}
+            style={{ cursor: 'pointer' }}
+          />
+        </div>
       </div>
-      <h3 className="text-2xl font-bold">Your logos</h3>
-      <div className="pt-0">
-        <UserLogos
-          logos={userLogos}
-          loading={loading}
-          setPollLogoID={setPollLogoID}
-        />
-      </div>
-      <h3 className="text-2xl font-bold">Upload and Edit Image</h3>
-      <ImageUploader onImageUpload={setImageFile} />
-      {imageFile && <ImageEditor imageFile={imageFile} />}
     </div>
   );
 }
