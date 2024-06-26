@@ -1,13 +1,13 @@
 "use client";
 
+import dynamic from 'next/dynamic';
 import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
-import dynamic from 'next/dynamic';
 
+import ImageUploader from "@/components/ImageUploader";
 import Hero from "@/components/hero";
 import Input from "@/components/input";
 import UserLogos from "@/components/user-logos";
-import ImageUploader from "@/components/ImageUploader";
 import { AppContext } from "@/contexts/AppContext";
 import { Logo } from "@/types/logo";
 
@@ -78,7 +78,7 @@ export default function Page() {
     return () => clearInterval(pollInterval);
   }, [pollLogoID]);
 
-  const handleBackgroundColorChange = (color) => {
+  const handleBackgroundColorChange = (color: string) => {
     setBackgroundColor(color);
   };
 
