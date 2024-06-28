@@ -87,8 +87,7 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
         </div>
       ) : (
         <Image
-          // src={logo.img_url}
-          src={logo.img_url.replace(".png", "_white.png")}
+          src={logo.img_url}
           alt={logo.img_description}
           width={350}
           height={200}

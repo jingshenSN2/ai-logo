@@ -22,8 +22,7 @@ function PublicLogoItem({ logo, index }: ItemProps) {
       className="rounded-xl overflow-hidden mb-4 border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
     >
       <Image
-        // src={logo.img_url}
-        src={logo.img_url.replace(".png", "_white.png")}
+        src={logo.img_url}
         alt={logo.img_description}
         width={350}
         height={200}
