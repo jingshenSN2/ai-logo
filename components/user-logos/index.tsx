@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { FaDownload, FaExclamationTriangle, FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
@@ -13,15 +13,17 @@ interface ItemProps {
   logo: Logo;
   index: number;
   setPollLogoID: (id: string) => void;
+  onImageClick: (imgRef: HTMLImageElement | null) => void;
 }
 
 interface Props {
   logos: Logo[];
   loading: boolean;
   setPollLogoID: (id: string) => void;
+  onImageClick: (imgRef: HTMLImageElement | null) => void;
 }
 
-function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
+function UserLogoItem({ logo, index, setPollLogoID, onImageClick }: ItemProps) {
   const [disable, setDisable] = useState(false);
 
   const onClickPublicOrPrivate = async () => {
@@ -67,7 +69,7 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
 
   const isGenerating = logo.status === "generating";
   const isFailed = logo.status === "failed";
-
+  const imageRef = useRef<HTMLImageElement>(null);
   return (
     <div key={index} className="rounded-xl overflow-hidden border border-solid">
       {isGenerating ? (
@@ -90,7 +92,9 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
           width={350}
           height={350}
           loading="lazy"
+          ref={imageRef}
           className="aspect-square object-contain"
+          onClick={() => onImageClick(imageRef.current)}
         />
       )}
 
@@ -108,7 +112,12 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
   );
 }
 
-export default function ({ logos, loading, setPollLogoID }: Props) {
+export default function ({
+  logos,
+  loading,
+  setPollLogoID,
+  onImageClick,
+}: Props) {
   return (
     <div className="mx-auto w-full max-w-7xl py-2">
       {loading ? (
@@ -121,6 +130,7 @@ export default function ({ logos, loading, setPollLogoID }: Props) {
               logo={logo}
               index={idx}
               setPollLogoID={setPollLogoID}
+              onImageClick={onImageClick}
             />
           ))}
         </div>

@@ -243,7 +243,7 @@ const ImageCanvas = ({ imageFile, backgroundColor }: ImageCanvasProps) => {
         style={{
           position: "absolute",
           top: 10,
-          left: 10,
+          right: 10,
           zIndex: 10,
           display: "flex",
           justifyContent: "space-between",

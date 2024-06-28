@@ -84,11 +84,16 @@ export default function Page() {
   };
 
   return (
-    <div className="flex">
+    <div className="flex gap-x-6">
       <div className="flex-1">
-        <ImageCanvas imageFile={imageFile} backgroundColor={backgroundColor} />
+        <div className="rounded-lg overflow-hidden p-4 border border-solid">
+          <ImageCanvas
+            imageFile={imageFile}
+            backgroundColor={backgroundColor}
+          />
+        </div>
       </div>
-      <div className="max-w-3xl mx-auto flex-1">
+      <div className="max-w-3xl flex-1">
         <Hero />
         <div className="my-2 flex justify-center">
           <Input fetchLogos={fetchLogos} />
@@ -99,6 +104,19 @@ export default function Page() {
             logos={userLogos}
             loading={loading}
             setPollLogoID={setPollLogoID}
+            onImageClick={(imgRef: HTMLImageElement | null) => {
+              console.log("Image clicked", imgRef);
+              // Read img as File and set it as imageFile
+              if (!imgRef) return;
+              fetch(imgRef.src)
+                .then((res) => res.blob())
+                .then((blob) => {
+                  const file = new File([blob], "logo.png", {
+                    type: blob.type,
+                  });
+                  setImageFile(file);
+                });
+            }}
           />
         </div>
         <h3 className="text-2xl font-bold">Upload and Edit Image</h3>
