@@ -166,7 +166,7 @@ export default function ({ fetchLogos }: Props) {
         >
           <Input
             type="text"
-            placeholder="Logo description"
+            placeholder="Description"
             value={inputs.description}
             onChange={(e) =>
               dispatch({
@@ -185,7 +185,7 @@ export default function ({ fetchLogos }: Props) {
       </div>
 
       <div className="flex items-center">
-        <h3 className="mx-2 my-4 text-sm text-[#636262]">Advance Options</h3>
+        <h3 className="mx-2 my-1 text-sm text-[#636262]">Advance Options</h3>
         <div
           className="cursor-pointer"
           onClick={() => setAdvanceOptOpen(!advanceOptOpen)}

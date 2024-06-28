@@ -40,8 +40,7 @@ async function fetchImageAndMetadata(url: string) {
 
 async function processOneAndUploadImage(
   tshirtColor: "black" | "grey" | "white",
-  imageBuffer: Buffer,
-  metadata: sharp.Metadata,
+  imageUrl: string,
   bucketName: string,
   s3Key: string
 ) {
@@ -58,6 +57,8 @@ async function processOneAndUploadImage(
     throw new Error("Failed to get tshirt image dimensions");
   }
 
+  // Download and process the image
+  const { imageBuffer, metadata } = await fetchImageAndMetadata(imageUrl);
   const { width: downloadedWidth, height: downloadedHeight } = metadata;
   if (downloadedWidth === undefined || downloadedHeight === undefined) {
     throw new Error("Failed to get downloaded image dimensions");
@@ -89,31 +90,28 @@ export async function processAndUploadImage(
   s3Key: string
 ) {
   // Download original image and upload to S3
-  const { imageBuffer, metadata } = await fetchImageAndMetadata(imageUrl);
+  const { imageBuffer } = await fetchImageAndMetadata(imageUrl);
   await uploadToS3(imageBuffer, bucketName, s3Key);
 
-  // Process and upload image on different tshirt colors
-  await Promise.all([
-    processOneAndUploadImage(
-      "black",
-      imageBuffer,
-      metadata,
-      bucketName,
-      s3Key.replace(".png", "_black.png")
-    ),
-    processOneAndUploadImage(
-      "grey",
-      imageBuffer,
-      metadata,
-      bucketName,
-      s3Key.replace(".png", "_grey.png")
-    ),
-    processOneAndUploadImage(
-      "white",
-      imageBuffer,
-      metadata,
-      bucketName,
-      s3Key.replace(".png", "_white.png")
-    ),
-  ]);
+  // // Process and upload image on different tshirt colors
+  // await Promise.all([
+  //   processOneAndUploadImage(
+  //     "black",
+  //     imageUrl,
+  //     bucketName,
+  //     s3Key.replace(".png", "_black.png")
+  //   ),
+  //   processOneAndUploadImage(
+  //     "grey",
+  //     imageUrl,
+  //     bucketName,
+  //     s3Key.replace(".png", "_grey.png")
+  //   ),
+  //   processOneAndUploadImage(
+  //     "white",
+  //     imageUrl,
+  //     bucketName,
+  //     s3Key.replace(".png", "_white.png")
+  //   ),
+  // ]);
 }

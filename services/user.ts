@@ -1,13 +1,18 @@
 import { findUser, insertUser } from "@/models/user_logo";
 import { User } from "@/types/user";
 
-export async function saveUser(user: User) {
+export async function getOrSaveUser(user: User): Promise<User> {
   try {
-    const existUser = await findUser(user.id);
+    let existUser = await findUser(user.id);
     if (!existUser) {
       await insertUser(user);
+      existUser = await findUser(user.id);
+      if (!existUser) {
+        throw new Error("save user failed");
+      }
     }
+    return existUser;
   } catch (e) {
-    console.log("save user failed: ", e);
+    throw new Error("get or save user failed");
   }
 }

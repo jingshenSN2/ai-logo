@@ -1,6 +1,6 @@
 import { respData, respErr } from "@/lib/resp";
 import { findUser, getUserCredits } from "@/models/user_logo";
-import { saveUser } from "@/services/user";
+import { getOrSaveUser } from "@/services/user";
 import { User } from "@/types/user";
 import { currentUser } from "@clerk/nextjs";
 
@@ -23,9 +23,7 @@ export async function POST(req: Request) {
       logos: [],
     };
 
-    await saveUser(userInfo);
-
-    const db_user = await findUser(id);
+    const db_user = await getOrSaveUser(userInfo);
     userInfo.super_user = db_user?.super_user || false;
 
     const user_credits = await getUserCredits(id);
