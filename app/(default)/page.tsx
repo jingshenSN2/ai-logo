@@ -1,6 +1,6 @@
 "use client";
 
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,8 +11,9 @@ import UserLogos from "@/components/user-logos";
 import { AppContext } from "@/contexts/AppContext";
 import { Logo } from "@/types/logo";
 
-// 动态导入 ImageCanvas 以确保仅在客户端加载
-const ImageCanvas = dynamic(() => import('@/components/ImageCanvas'), { ssr: false });
+const ImageCanvas = dynamic(() => import("@/components/ImageCanvas"), {
+  ssr: false,
+});
 
 export default function Page() {
   const { user } = useContext(AppContext);
@@ -105,19 +106,25 @@ export default function Page() {
         <div className="flex items-center mt-4">
           <span className="mr-2">Background:</span>
           <div
-            className={`w-6 h-6 rounded-full bg-white border ${backgroundColor === 'white_t' ? 'border-black' : ''}`}
-            onClick={() => handleBackgroundColorChange('white_t')}
-            style={{ cursor: 'pointer' }}
+            className={`w-6 h-6 rounded-full bg-white border ${
+              backgroundColor === "white_t" ? "border-black" : ""
+            }`}
+            onClick={() => handleBackgroundColorChange("white_t")}
+            style={{ cursor: "pointer" }}
           />
           <div
-            className={`w-6 h-6 rounded-full bg-black border ml-2 ${backgroundColor === 'black_t' ? 'border-black' : ''}`}
-            onClick={() => handleBackgroundColorChange('black_t')}
-            style={{ cursor: 'pointer' }}
+            className={`w-6 h-6 rounded-full bg-black border ml-2 ${
+              backgroundColor === "black_t" ? "border-black" : ""
+            }`}
+            onClick={() => handleBackgroundColorChange("black_t")}
+            style={{ cursor: "pointer" }}
           />
           <div
-            className={`w-6 h-6 rounded-full bg-gray-500 border ml-2 ${backgroundColor === 'grey_t' ? 'border-black' : ''}`}
-            onClick={() => handleBackgroundColorChange('grey_t')}
-            style={{ cursor: 'pointer' }}
+            className={`w-6 h-6 rounded-full bg-gray-500 border ml-2 ${
+              backgroundColor === "grey_t" ? "border-black" : ""
+            }`}
+            onClick={() => handleBackgroundColorChange("grey_t")}
+            style={{ cursor: "pointer" }}
           />
         </div>
       </div>

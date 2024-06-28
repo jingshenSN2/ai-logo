@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { FabricJSCanvas, useFabricJSEditor } from 'fabricjs-react';
-import { fabric } from 'fabric';
+import { fabric } from "fabric";
+import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
+import React, { useEffect, useState } from "react";
 
 interface ImageEditorProps {
   imageFile: File | null;
@@ -28,18 +28,20 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageFile }) => {
       fabric.Image.fromURL(imageSrc, (img) => {
         const canvasWidth = editor.canvas.getWidth();
         const canvasHeight = editor.canvas.getHeight();
+        const imgHeight = img.height || canvasHeight;
+        const imgWidth = img.width || canvasWidth;
 
         let scale = 1;
-        if (img.width > canvasWidth || img.height > canvasHeight) {
-          const widthScale = canvasWidth / img.width;
-          const heightScale = canvasHeight / img.height;
+        if (imgWidth > canvasWidth || imgHeight > canvasHeight) {
+          const widthScale = canvasWidth / imgWidth;
+          const heightScale = canvasHeight / imgHeight;
           scale = Math.min(widthScale, heightScale);
         }
 
         img.scale(scale);
         img.set({
-          left: canvasWidth / 2 - (img.width * scale) / 2,
-          top: canvasHeight / 2 - (img.height * scale) / 2,
+          left: canvasWidth / 2 - (imgWidth * scale) / 2,
+          top: canvasHeight / 2 - (imgHeight * scale) / 2,
           selectable: true,
         });
 
@@ -51,7 +53,9 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageFile }) => {
   }, [editor, imageSrc]);
 
   return (
-    <FabricJSCanvas className="sample-canvas" onReady={onReady} style={{ width: maxCanvasWidth, height: maxCanvasHeight }} />
+    <div style={{ width: maxCanvasWidth, height: maxCanvasHeight }}>
+      <FabricJSCanvas className="sample-canvas" onReady={onReady} />
+    </div>
   );
 };
 

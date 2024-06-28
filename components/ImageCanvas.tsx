@@ -1,21 +1,31 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { fabric } from 'fabric';
-import { FabricJSCanvas, useFabricJSEditor } from 'fabricjs-react';
-import { FaUndo, FaRedo, FaTrash } from 'react-icons/fa'; // 引入FontAwesome图标
+import { fabric } from "fabric";
+import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { FaRedo, FaTrash, FaUndo } from "react-icons/fa"; // 引入FontAwesome图标
 
 const MAX_HISTORY_LENGTH = 50;
 
-const ImageCanvas = ({ imageFile, backgroundColor }) => {
-  const { editor, onReady } = useFabricJSEditor();
-  const [history, setHistory] = useState([]);
-  const [redoStack, setRedoStack] = useState([]);
-  const [isUndoRedoAction, setIsUndoRedoAction] = useState(false);
-  const canvasContainerRef = useRef(null);
+type ImageCanvasProps = {
+  imageFile: File | null;
+  backgroundColor: string;
+};
 
-  const backgroundMap = {
-    'white_t': '/white_t.jpg',
-    'black_t': '/black_t.jpg',
-    'grey_t': '/grey_t.jpg',
+type CanvasHistory = {
+  version: string;
+  objects: fabric.Object[];
+};
+
+const ImageCanvas = ({ imageFile, backgroundColor }: ImageCanvasProps) => {
+  const { editor, onReady } = useFabricJSEditor();
+  const [history, setHistory] = useState([] as CanvasHistory[]);
+  const [redoStack, setRedoStack] = useState([] as CanvasHistory[]);
+  const [isUndoRedoAction, setIsUndoRedoAction] = useState(false);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+
+  const backgroundMap: Record<string, string> = {
+    white_t: "/white_t.jpg",
+    black_t: "/black_t.jpg",
+    grey_t: "/grey_t.jpg",
   };
 
   const resizeCanvas = useCallback(() => {
@@ -26,15 +36,17 @@ const ImageCanvas = ({ imageFile, backgroundColor }) => {
       editor.canvas.setWidth(containerWidth);
       editor.canvas.setHeight(containerHeight);
 
-      if (editor.canvas.backgroundImage) {
+      // if not null and is an instance of Image
+      if (editor.canvas.backgroundImage instanceof fabric.Image) {
         const backgroundImage = editor.canvas.backgroundImage;
-        const scaleFactor = containerWidth / backgroundImage.width;
+        const scaleFactor =
+          containerWidth / (backgroundImage.width ?? containerWidth);
         backgroundImage.scale(scaleFactor);
         backgroundImage.set({
           left: containerWidth / 2,
           top: containerHeight / 2,
-          originX: 'center',
-          originY: 'center',
+          originX: "center",
+          originY: "center",
         });
         editor.canvas.renderAll();
       }
@@ -43,56 +55,71 @@ const ImageCanvas = ({ imageFile, backgroundColor }) => {
 
   const addBackground = useCallback(() => {
     if (!editor || !fabric) {
-      console.log('Editor or fabric not loaded');
+      console.log("Editor or fabric not loaded");
       return;
     }
 
-    const backgroundImageUrl = backgroundMap[backgroundColor] || backgroundMap['white_t'];
+    const backgroundImageUrl =
+      backgroundMap[backgroundColor] || backgroundMap["white_t"];
 
     fabric.Image.fromURL(backgroundImageUrl, (image) => {
       if (!image) {
-        console.log('Image not loaded');
+        console.log("Image not loaded");
         return;
       }
 
-      const containerWidth = canvasContainerRef.current ? canvasContainerRef.current.offsetWidth : 0;
-      const containerHeight = canvasContainerRef.current ? canvasContainerRef.current.offsetHeight : 0;
+      const containerWidth = canvasContainerRef.current
+        ? canvasContainerRef.current.offsetWidth
+        : 0;
+      const containerHeight = canvasContainerRef.current
+        ? canvasContainerRef.current.offsetHeight
+        : 0;
 
       editor.canvas.setWidth(containerWidth);
       editor.canvas.setHeight(containerHeight);
 
-      const scaleFactor = containerWidth / image.width;
+      const scaleFactor = containerWidth / (image.width ?? containerWidth);
       image.scale(scaleFactor);
       image.set({
-        originX: 'center',
-        originY: 'center',
+        originX: "center",
+        originY: "center",
         left: containerWidth / 2,
         top: containerHeight / 2,
       });
 
-      editor.canvas.setBackgroundImage(image, editor.canvas.renderAll.bind(editor.canvas));
+      editor.canvas.setBackgroundImage(
+        image,
+        editor.canvas.renderAll.bind(editor.canvas)
+      );
     });
   }, [editor, backgroundColor]);
 
-  const addImageToCanvas = useCallback((url) => {
-    fabric.Image.fromURL(url, (img) => {
-      const containerWidth = canvasContainerRef.current.offsetWidth;
-      const containerHeight = canvasContainerRef.current.offsetHeight;
+  const addImageToCanvas = useCallback(
+    (url: string) => {
+      fabric.Image.fromURL(url, (img) => {
+        const containerWidth = canvasContainerRef.current
+          ? canvasContainerRef.current.offsetWidth
+          : 0;
+        const containerHeight = canvasContainerRef.current
+          ? canvasContainerRef.current.offsetHeight
+          : 0;
 
-      img.scaleToWidth(containerWidth / 3);
-      img.scaleToHeight(containerHeight / 3);
-      img.set({
-        left: containerWidth / 2 - (img.getScaledWidth() / 2),
-        top: containerHeight / 2 - (img.getScaledHeight() / 2),
-        selectable: true,
-        opacity: 0.9,
+        img.scaleToWidth(containerWidth / 3);
+        img.scaleToHeight(containerHeight / 3);
+        img.set({
+          left: containerWidth / 2 - img.getScaledWidth() / 2,
+          top: containerHeight / 2 - img.getScaledHeight() / 2,
+          selectable: true,
+          opacity: 0.9,
+        });
+
+        editor?.canvas.add(img);
+        editor?.canvas.renderAll();
+        editor?.canvas.setActiveObject(img);
       });
-
-      editor.canvas.add(img);
-      editor.canvas.renderAll();
-      editor.canvas.setActiveObject(img);
-    });
-  }, [editor]);
+    },
+    [editor]
+  );
 
   useEffect(() => {
     if (editor) {
@@ -102,16 +129,17 @@ const ImageCanvas = ({ imageFile, backgroundColor }) => {
         if (!isUndoRedoAction) {
           const json = editor.canvas.toJSON();
           setHistory((prevHistory) => {
-            const newHistory = prevHistory.length >= MAX_HISTORY_LENGTH
-              ? prevHistory.slice(1).concat(json)
-              : prevHistory.concat(json);
+            const newHistory =
+              prevHistory.length >= MAX_HISTORY_LENGTH
+                ? prevHistory.slice(1).concat(json)
+                : prevHistory.concat(json);
             return newHistory;
           });
           setRedoStack([]);
         }
       };
 
-      const events = ['object:added', 'object:modified', 'object:removed'];
+      const events = ["object:added", "object:modified", "object:removed"];
       events.forEach((event) => editor.canvas.on(event, saveHistory));
 
       return () => {
@@ -124,7 +152,10 @@ const ImageCanvas = ({ imageFile, backgroundColor }) => {
     if (editor && imageFile) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        addImageToCanvas(event.target.result);
+        if (typeof event.target?.result !== "string") {
+          return;
+        }
+        addImageToCanvas(event.target?.result);
       };
       reader.readAsDataURL(imageFile);
     }
@@ -134,10 +165,13 @@ const ImageCanvas = ({ imageFile, backgroundColor }) => {
     if (history.length > 1) {
       setIsUndoRedoAction(true);
       const prevState = history[history.length - 2];
-      setRedoStack((prevRedoStack) => [...prevRedoStack, history[history.length - 1]]);
+      setRedoStack((prevRedoStack) => [
+        ...prevRedoStack,
+        history[history.length - 1],
+      ]);
       setHistory((prevHistory) => prevHistory.slice(0, -1));
 
-      editor.canvas.loadFromJSON(prevState, () => {
+      editor?.canvas.loadFromJSON(prevState, () => {
         editor.canvas.renderAll();
         setIsUndoRedoAction(false);
       });
@@ -151,7 +185,7 @@ const ImageCanvas = ({ imageFile, backgroundColor }) => {
       setRedoStack((prevRedoStack) => prevRedoStack.slice(0, -1));
       setHistory((prevHistory) => [...prevHistory, nextState]);
 
-      editor.canvas.loadFromJSON(nextState, () => {
+      editor?.canvas.loadFromJSON(nextState, () => {
         editor.canvas.renderAll();
         setIsUndoRedoAction(false);
       });
@@ -159,34 +193,34 @@ const ImageCanvas = ({ imageFile, backgroundColor }) => {
   }, [redoStack, editor]);
 
   const handleDelete = useCallback(() => {
-    const activeObject = editor.canvas.getActiveObject();
+    const activeObject = editor?.canvas.getActiveObject();
     if (activeObject) {
-      editor.canvas.remove(activeObject);
-      editor.canvas.renderAll();
+      editor?.canvas.remove(activeObject);
+      editor?.canvas.renderAll();
     }
   }, [editor]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.metaKey && e.key === 'z' && !e.shiftKey) {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey && e.key === "z" && !e.shiftKey) {
         handleUndo();
-      } else if (e.metaKey && e.key === 'z' && e.shiftKey) {
+      } else if (e.metaKey && e.key === "z" && e.shiftKey) {
         handleRedo();
-      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+      } else if (e.key === "Delete" || e.key === "Backspace") {
         handleDelete();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleUndo, handleRedo, handleDelete]);
 
   useEffect(() => {
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener("resize", resizeCanvas);
     };
   }, [resizeCanvas]);
 
@@ -201,11 +235,24 @@ const ImageCanvas = ({ imageFile, backgroundColor }) => {
   }, [backgroundColor, editor, addBackground]);
 
   return (
-    <div ref={canvasContainerRef} style={{ width: '100%', height: '100vh', position: 'relative' }}>
-      <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10, display: 'flex', justifyContent: 'space-between', width: '10em' }}>
-        <FaUndo onClick={handleUndo} style={{ cursor: 'pointer' }} />
-        <FaRedo onClick={handleRedo} style={{ cursor: 'pointer' }} />
-        <FaTrash onClick={handleDelete} style={{ cursor: 'pointer' }} />
+    <div
+      ref={canvasContainerRef}
+      style={{ width: "100%", height: "100vh", position: "relative" }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 10,
+          left: 10,
+          zIndex: 10,
+          display: "flex",
+          justifyContent: "space-between",
+          width: "10em",
+        }}
+      >
+        <FaUndo onClick={handleUndo} style={{ cursor: "pointer" }} />
+        <FaRedo onClick={handleRedo} style={{ cursor: "pointer" }} />
+        <FaTrash onClick={handleDelete} style={{ cursor: "pointer" }} />
       </div>
       <FabricJSCanvas className="sample-canvas" onReady={onReady} />
     </div>
