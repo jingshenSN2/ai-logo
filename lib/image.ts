@@ -93,25 +93,25 @@ export async function processAndUploadImage(
   const { imageBuffer } = await fetchImageAndMetadata(imageUrl);
   await uploadToS3(imageBuffer, bucketName, s3Key);
 
-  // Process and upload image on different tshirt colors
-  await Promise.all([
-    processOneAndUploadImage(
-      "black",
-      imageUrl,
-      bucketName,
-      s3Key.replace(".png", "_black.png")
-    ),
-    processOneAndUploadImage(
-      "grey",
-      imageUrl,
-      bucketName,
-      s3Key.replace(".png", "_grey.png")
-    ),
-    processOneAndUploadImage(
-      "white",
-      imageUrl,
-      bucketName,
-      s3Key.replace(".png", "_white.png")
-    ),
-  ]);
+  // // Process and upload image on different tshirt colors
+  // await Promise.all([
+  //   processOneAndUploadImage(
+  //     "black",
+  //     imageUrl,
+  //     bucketName,
+  //     s3Key.replace(".png", "_black.png")
+  //   ),
+  //   processOneAndUploadImage(
+  //     "grey",
+  //     imageUrl,
+  //     bucketName,
+  //     s3Key.replace(".png", "_grey.png")
+  //   ),
+  //   processOneAndUploadImage(
+  //     "white",
+  //     imageUrl,
+  //     bucketName,
+  //     s3Key.replace(".png", "_white.png")
+  //   ),
+  // ]);
 }
