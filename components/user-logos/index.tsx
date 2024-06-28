@@ -53,7 +53,7 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
   };
 
   const onClickRetry = async () => {
-    const uri = "/api/protected/regen-logo";
+    const uri = "/api/protected/gen-logo";
     const body = JSON.stringify({
       logo_id: logo.id,
     });
@@ -130,7 +130,9 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
               <p>Download unavailable</p>
             </div>
           ) : isFailed ? (
-            <Button onClick={onClickRetry}>Retry</Button>
+            <Button onClick={onClickRetry} disabled={isGenerating}>
+              Retry
+            </Button>
           ) : (
             <a
               href={logo.img_url}

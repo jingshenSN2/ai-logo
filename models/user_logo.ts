@@ -44,14 +44,31 @@ export async function findUser(user_id: string): Promise<User | undefined> {
   }
 }
 
-export async function insertLogo(user_id: string, logo: Logo) {
+export async function updateOrInsertLogo(
+  user_id: string,
+  logo_id: string,
+  newLogo: Logo
+) {
   const user = await findUser(user_id);
   if (user) {
-    user.logos.unshift(logo);
+    const idx = user.logos.findIndex((l) => l.id === logo_id);
+    if (idx > -1) {
+      // Update the logo if it exists
+      user.logos[idx] = { ...user.logos[idx], ...newLogo };
+    } else {
+      // Insert the logo if not
+      user.logos.unshift(newLogo);
+    }
     const docClient = getDocClient();
-    const command = new PutCommand({
+    const command = new UpdateCommand({
       TableName: USER_LOGO_TABLE_NAME,
-      Item: user,
+      Key: {
+        id: user_id,
+      },
+      UpdateExpression: "SET logos = :logos",
+      ExpressionAttributeValues: {
+        ":logos": user.logos,
+      },
     });
 
     try {
@@ -59,38 +76,6 @@ export async function insertLogo(user_id: string, logo: Logo) {
       return response;
     } catch (error) {
       throw error;
-    }
-  }
-}
-
-export async function updateLogo(
-  user_id: string,
-  logo_id: string,
-  logoInfo: Partial<Logo>
-) {
-  const user = await findUser(user_id);
-  if (user) {
-    const idx = user.logos.findIndex((l) => l.id === logo_id);
-    if (idx > -1) {
-      user.logos[idx] = { ...user.logos[idx], ...logoInfo };
-      const docClient = getDocClient();
-      const command = new UpdateCommand({
-        TableName: USER_LOGO_TABLE_NAME,
-        Key: {
-          id: user_id,
-        },
-        UpdateExpression: "SET logos = :logos",
-        ExpressionAttributeValues: {
-          ":logos": user.logos,
-        },
-      });
-
-      try {
-        const response = await docClient.send(command);
-        return response;
-      } catch (error) {
-        throw error;
-      }
     }
   }
 }
@@ -126,9 +111,11 @@ export async function getUserCredits(user_id: string): Promise<UserCredits> {
   try {
     const user = await findUser(user_id);
     if (user) {
-      // user_credits.used_credits = user.logos.length;  
+      // user_credits.used_credits = user.logos.length;
       // TODO, if the logo is not generated successfully, the used_credits should not be decreased
-      user_credits.used_credits = user.logos.filter(l => l.status === "success").length;
+      user_credits.used_credits = user.logos.filter(
+        (l) => l.status === "success"
+      ).length;
       user_credits.left_credits =
         user_credits.total_credits - user_credits.used_credits;
     }
