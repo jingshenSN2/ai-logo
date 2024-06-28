@@ -6,8 +6,6 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import { FaDownload, FaExclamationTriangle, FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/types/logo";
 
@@ -71,85 +69,40 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
   const isFailed = logo.status === "failed";
 
   return (
-    <div
-      key={index}
-      className="rounded-xl overflow-hidden mb-4 border border-solid border-[#cdcdcd] md:mb-8 lg:mb-10"
-    >
+    <div key={index} className="rounded-xl overflow-hidden border border-solid">
       {isGenerating ? (
-        <div className="py-5 bg-black bg-opacity-50 flex flex-col items-center justify-center aspect-[14/8]">
+        <div className="py-5 bg-black bg-opacity-50 flex flex-col items-center justify-center aspect-square">
           <FaSpinner className="animate-spin text-white text-4xl" />
           <p className="text-white text-2xl font-bold mt-2">Generating...</p>
         </div>
       ) : isFailed ? (
-        <div className="py-5 bg-black bg-opacity-50 flex flex-col items-center justify-center aspect-[14/8]">
+        <div className="py-5 bg-black bg-opacity-50 flex flex-col items-center justify-center aspect-square">
           <FaExclamationTriangle className="text-white text-4xl" />
-          <p className="text-white text-2xl font-bold mt-2">Generate failed</p>
+          <p className="text-white text-xl font-bold mt-2">Failed</p>
+          <Button onClick={onClickRetry} disabled={isGenerating}>
+            Retry
+          </Button>
         </div>
       ) : (
         <Image
           src={logo.img_url}
           alt={logo.img_description}
           width={350}
-          height={200}
+          height={350}
           loading="lazy"
-          className="aspect-[14/8] object-contain"
+          className="aspect-square object-contain"
         />
       )}
 
-      <div className="px-5 py-4 sm:px-6">
+      <div className="px-2 text-center">
         <CopyToClipboard
           text={logo.img_description}
-          onCopy={() => toast.success("Copied")}
+          onCopy={() => toast.success("Prompt Copied")}
         >
           <p className="text-[#808080] truncate w-full cursor-pointer">
             {logo.img_description}
           </p>
         </CopyToClipboard>
-        <div className="flex items-start mb-5 mt-6 flex-wrap gap-2 md:mb-6 lg:mb-8">
-          <div className="flex flex-wrap gap-2 flex-1">
-            <Badge variant="secondary">{logo.img_size}</Badge>
-            <Badge variant="secondary">{logo.llm_name}</Badge>
-            {logo.llm_name === "dall-e-3" && (
-              <Badge variant="secondary">{logo.img_quality}</Badge>
-            )}
-            {logo.llm_name === "dall-e-3" && (
-              <Badge variant="secondary">{logo.img_style}</Badge>
-            )}
-          </div>
-          <Avatar>
-            <AvatarImage
-              src={logo.created_user_avatar_url}
-              alt={logo.created_user_nickname}
-            />
-            <AvatarFallback>{logo.created_user_nickname}</AvatarFallback>
-          </Avatar>
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          {isGenerating ? (
-            <div className="flex items-center max-w-full gap-2.5 text-sm font-bold uppercase text-gray-500">
-              <p>Download unavailable</p>
-            </div>
-          ) : isFailed ? (
-            <Button onClick={onClickRetry} disabled={isGenerating}>
-              Retry
-            </Button>
-          ) : (
-            <a
-              href={logo.img_url}
-              className="flex items-center max-w-full gap-2.5 text-sm font-bold uppercase text-black"
-            >
-              <p>Download</p>
-              <p className="text-sm">
-                <FaDownload />
-              </p>
-            </a>
-          )}
-          {!isGenerating && !isFailed && (
-            <Button onClick={onClickPublicOrPrivate} disabled={disable}>
-              Public/Private
-            </Button>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -157,11 +110,11 @@ function UserLogoItem({ logo, index, setPollLogoID }: ItemProps) {
 
 export default function ({ logos, loading, setPollLogoID }: Props) {
   return (
-    <div className="mx-auto w-full max-w-7xl px-0 py-2 md:px-10 md:py-8 lg:py-8">
+    <div className="mx-auto w-full max-w-7xl py-2">
       {loading ? (
         <div className="text-center mx-auto py-4">loading...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-4">
           {logos?.map((logo, idx) => (
             <UserLogoItem
               key={logo.id}

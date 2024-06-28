@@ -84,13 +84,13 @@ export default function Page() {
   };
 
   return (
-    <div className="md:mt-16 flex">
+    <div className="flex">
       <div className="flex-1">
         <ImageCanvas imageFile={imageFile} backgroundColor={backgroundColor} />
       </div>
       <div className="max-w-3xl mx-auto flex-1">
         <Hero />
-        <div className="mx-auto my-4 flex max-w-lg justify-center">
+        <div className="my-2 flex justify-center">
           <Input fetchLogos={fetchLogos} />
         </div>
         <h3 className="text-2xl font-bold">Your logos</h3>
