@@ -7,7 +7,6 @@ const MAX_HISTORY_LENGTH = 50;
 
 type ImageCanvasProps = {
   imageFile: File | null;
-  backgroundColor: string;
 };
 
 type CanvasHistory = {
@@ -15,11 +14,12 @@ type CanvasHistory = {
   objects: fabric.Object[];
 };
 
-const ImageCanvas = ({ imageFile, backgroundColor }: ImageCanvasProps) => {
+const ImageCanvas = ({ imageFile }: ImageCanvasProps) => {
   const { editor, onReady } = useFabricJSEditor();
   const [history, setHistory] = useState([] as CanvasHistory[]);
   const [redoStack, setRedoStack] = useState([] as CanvasHistory[]);
   const [isUndoRedoAction, setIsUndoRedoAction] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState("white_t");
   const canvasContainerRef = useRef<HTMLDivElement>(null);
 
   const backgroundMap: Record<string, string> = {
@@ -239,20 +239,34 @@ const ImageCanvas = ({ imageFile, backgroundColor }: ImageCanvasProps) => {
       ref={canvasContainerRef}
       style={{ width: "100%", height: "100vh", position: "relative" }}
     >
-      <div
-        style={{
-          position: "absolute",
-          top: 10,
-          right: 10,
-          zIndex: 10,
-          display: "flex",
-          justifyContent: "space-between",
-          width: "10em",
-        }}
-      >
-        <FaUndo onClick={handleUndo} style={{ cursor: "pointer" }} />
-        <FaRedo onClick={handleRedo} style={{ cursor: "pointer" }} />
-        <FaTrash onClick={handleDelete} style={{ cursor: "pointer" }} />
+      <div className="absolute top-2 left-2 z-10">
+        <div className="flex items-center space-x-3">
+          <div
+            className={`w-6 h-6 rounded-full bg-white border cursor-pointer ${
+              backgroundColor === "white_t" ? "border-black" : ""
+            }`}
+            onClick={() => setBackgroundColor("white_t")}
+          />
+          <div
+            className={`w-6 h-6 rounded-full bg-black border cursor-pointer ${
+              backgroundColor === "black_t" ? "border-black" : ""
+            }`}
+            onClick={() => setBackgroundColor("black_t")}
+          />
+          <div
+            className={`w-6 h-6 rounded-full bg-gray-500 border cursor-pointer ${
+              backgroundColor === "grey_t" ? "border-black" : ""
+            }`}
+            onClick={() => setBackgroundColor("grey_t")}
+          />
+        </div>
+      </div>
+      <div className="absolute top-2 right-2 z-10">
+        <div className="flex items-center space-x-10">
+          <FaUndo onClick={handleUndo} className="cursor-pointer" />
+          <FaRedo onClick={handleRedo} className="cursor-pointer" />
+          <FaTrash onClick={handleDelete} className="cursor-pointer" />
+        </div>
       </div>
       <FabricJSCanvas className="sample-canvas" onReady={onReady} />
     </div>

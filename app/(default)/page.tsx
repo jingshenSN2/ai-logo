@@ -21,7 +21,6 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [pollLogoID, setPollLogoID] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null); // State to hold the selected image file
-  const [backgroundColor, setBackgroundColor] = useState("white_t"); // State to hold the background color
 
   const fetchLogos = async function () {
     try {
@@ -79,18 +78,11 @@ export default function Page() {
     return () => clearInterval(pollInterval);
   }, [pollLogoID]);
 
-  const handleBackgroundColorChange = (color: string) => {
-    setBackgroundColor(color);
-  };
-
   return (
     <div className="flex gap-x-6">
       <div className="flex-1">
         <div className="rounded-lg overflow-hidden p-4 border border-solid">
-          <ImageCanvas
-            imageFile={imageFile}
-            backgroundColor={backgroundColor}
-          />
+          <ImageCanvas imageFile={imageFile} />
         </div>
       </div>
       <div className="max-w-3xl flex-1">
@@ -121,30 +113,6 @@ export default function Page() {
         </div>
         <h3 className="text-2xl font-bold">Upload and Edit Image</h3>
         <ImageUploader onImageUpload={setImageFile} />
-        <div className="flex items-center mt-4">
-          <span className="mr-2">Background:</span>
-          <div
-            className={`w-6 h-6 rounded-full bg-white border ${
-              backgroundColor === "white_t" ? "border-black" : ""
-            }`}
-            onClick={() => handleBackgroundColorChange("white_t")}
-            style={{ cursor: "pointer" }}
-          />
-          <div
-            className={`w-6 h-6 rounded-full bg-black border ml-2 ${
-              backgroundColor === "black_t" ? "border-black" : ""
-            }`}
-            onClick={() => handleBackgroundColorChange("black_t")}
-            style={{ cursor: "pointer" }}
-          />
-          <div
-            className={`w-6 h-6 rounded-full bg-gray-500 border ml-2 ${
-              backgroundColor === "grey_t" ? "border-black" : ""
-            }`}
-            onClick={() => handleBackgroundColorChange("grey_t")}
-            style={{ cursor: "pointer" }}
-          />
-        </div>
       </div>
     </div>
   );
