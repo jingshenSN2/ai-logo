@@ -115,7 +115,6 @@ export default function Page() {
         <h3 className="text-2xl font-bold">Upload and Edit Image</h3>
         <ImageUploader onImageUpload={setImageFile} />
         <div className="mt-6">
-          <h3 className="text-2xl font-bold mb-4">Upgrade to Premium</h3>
           <StripeButton 
             buyButtonId="buy_btn_1PcwJJRvffTd7ttlE3xYAJDx"
             publishableKey="pk_test_51PatnnRvffTd7ttlX8dfYxHNGhQdNl9jJZbr7NL36PTlx0EkqlmaXb6LFiMYgi4BpOr4zymB6lzh1thuy82eV0XC00ui1w3kxz"
