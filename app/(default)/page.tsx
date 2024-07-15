@@ -10,6 +10,7 @@ import Input from "@/components/input";
 import UserLogos from "@/components/user-logos";
 import { AppContext } from "@/contexts/AppContext";
 import { Logo } from "@/types/logo";
+import StripeButton from "@/components/payment/StripeButton";
 
 const ImageCanvas = dynamic(() => import("@/components/ImageCanvas"), {
   ssr: false,
@@ -113,6 +114,13 @@ export default function Page() {
         </div>
         <h3 className="text-2xl font-bold">Upload and Edit Image</h3>
         <ImageUploader onImageUpload={setImageFile} />
+        <div className="mt-6">
+          <h3 className="text-2xl font-bold mb-4">Upgrade to Premium</h3>
+          <StripeButton 
+            buyButtonId="buy_btn_1PcwJJRvffTd7ttlE3xYAJDx"
+            publishableKey="pk_test_51PatnnRvffTd7ttlX8dfYxHNGhQdNl9jJZbr7NL36PTlx0EkqlmaXb6LFiMYgi4BpOr4zymB6lzh1thuy82eV0XC00ui1w3kxz"
+          />
+        </div>
       </div>
     </div>
   );
