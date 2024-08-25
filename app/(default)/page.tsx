@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from 'next/navigation';
 
 import ImageUploader from "@/components/ImageUploader";
 import Hero from "@/components/hero";
@@ -21,8 +22,10 @@ export default function Page() {
   const [userLogos, setUserLogos] = useState<Logo[]>([]);
   const [loading, setLoading] = useState(true);
   const [pollLogoID, setPollLogoID] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null); // State to hold the selected image file
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const router = useRouter();
 
+  // ... (keep existing fetchLogos and checkLogoStatus functions)
   const fetchLogos = async function () {
     try {
       const uri = "/api/protected/get-user-logos";
@@ -79,6 +82,12 @@ export default function Page() {
     return () => clearInterval(pollInterval);
   }, [pollLogoID]);
 
+  const handleEditClick = (logoId: string) => {
+    router.push(`/edit/${logoId}`);
+  };
+
+  // ... (keep existing useEffect hooks)
+
   return (
     <div className="flex gap-x-6">
       <div className="flex-1">
@@ -99,7 +108,6 @@ export default function Page() {
             setPollLogoID={setPollLogoID}
             onImageClick={(imgRef: HTMLImageElement | null) => {
               console.log("Image clicked", imgRef);
-              // Read img as File and set it as imageFile
               if (!imgRef) return;
               fetch(imgRef.src)
                 .then((res) => res.blob())
@@ -110,6 +118,7 @@ export default function Page() {
                   setImageFile(file);
                 });
             }}
+            onEditClick={handleEditClick}
           />
         </div>
         <h3 className="text-2xl font-bold">Upload and Edit Image</h3>
