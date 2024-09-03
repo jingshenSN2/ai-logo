@@ -21,6 +21,7 @@ interface Props {
   loading: boolean;
   setPollLogoID: (id: string) => void;
   onImageClick: (imgRef: HTMLImageElement | null) => void;
+  onEditClick: (id: string) => void;
 }
 
 function UserLogoItem({ logo, index, setPollLogoID, onImageClick }: ItemProps) {
@@ -117,6 +118,7 @@ export default function ({
   loading,
   setPollLogoID,
   onImageClick,
+  onEditClick,
 }: Props) {
   return (
     <div className="mx-auto w-full max-w-7xl py-2">
